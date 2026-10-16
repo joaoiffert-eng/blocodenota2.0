@@ -26,6 +26,7 @@ public class Note implements Serializable {
     private String category; // "estudos", "trabalho", "pessoal"
     private boolean isFavorite;
     private boolean isPinned;
+    private boolean isLocked;
     private long createdAt;
     private long updatedAt;
 
@@ -35,6 +36,7 @@ public class Note implements Serializable {
         this.category = "estudos";
         this.isFavorite = false;
         this.isPinned = false;
+        this.isLocked = false;
     }
 
     public Note(String title, String content, String category) {

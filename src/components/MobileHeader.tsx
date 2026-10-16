@@ -7,8 +7,7 @@ import {
   Moon, 
   LogOut, 
   Code2, 
-  Type,
-  Plus
+  Type
 } from 'lucide-react';
 import { TextSize } from '../types/note';
 

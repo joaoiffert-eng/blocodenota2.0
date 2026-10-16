@@ -1,11 +1,4 @@
 import React from 'react';
-import { 
-  Folder, 
-  GraduationCap, 
-  Briefcase, 
-  HeartHandshake, 
-  Star 
-} from 'lucide-react';
 import { FilterCategory, Note } from '../types/note';
 
 interface MobileBottomNavProps {
@@ -29,74 +22,73 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     {
       id: 'todas' as FilterCategory,
       label: 'Início',
-      icon: Folder,
       count: countAll,
-      activeColor: 'text-slate-900 dark:text-white',
-      badgeBg: 'bg-slate-200 dark:bg-slate-700',
+      activeStyle: 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm font-bold',
+      inactiveStyle: 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 font-medium',
+      badgeActive: 'bg-white/20 text-white dark:bg-slate-900/20 dark:text-slate-900',
+      badgeInactive: 'bg-slate-200/80 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
     },
     {
       id: 'estudos' as FilterCategory,
       label: 'Estudos',
-      icon: GraduationCap,
       count: countEstudos,
-      activeColor: 'text-blue-600 dark:text-blue-400',
-      badgeBg: 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300',
+      activeStyle: 'bg-blue-600 text-white shadow-sm shadow-blue-500/20 font-bold',
+      inactiveStyle: 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 font-medium',
+      badgeActive: 'bg-white/25 text-white',
+      badgeInactive: 'bg-blue-100 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300',
     },
     {
       id: 'trabalho' as FilterCategory,
       label: 'Trabalho',
-      icon: Briefcase,
       count: countTrabalho,
-      activeColor: 'text-emerald-600 dark:text-emerald-400',
-      badgeBg: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300',
+      activeStyle: 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-bold',
+      inactiveStyle: 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-medium',
+      badgeActive: 'bg-white/25 text-white',
+      badgeInactive: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300',
     },
     {
       id: 'pessoal' as FilterCategory,
       label: 'Pessoal',
-      icon: HeartHandshake,
       count: countPessoal,
-      activeColor: 'text-purple-600 dark:text-purple-400',
-      badgeBg: 'bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300',
+      activeStyle: 'bg-purple-600 text-white shadow-sm shadow-purple-500/20 font-bold',
+      inactiveStyle: 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-medium',
+      badgeActive: 'bg-white/25 text-white',
+      badgeInactive: 'bg-purple-100 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300',
     },
     {
       id: 'favoritos' as FilterCategory,
       label: 'Favoritos',
-      icon: Star,
       count: countFavorites,
-      activeColor: 'text-amber-500',
-      badgeBg: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300',
+      activeStyle: 'bg-amber-500 text-white shadow-sm shadow-amber-500/20 font-bold',
+      inactiveStyle: 'text-slate-600 dark:text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 font-medium',
+      badgeActive: 'bg-white/25 text-white',
+      badgeInactive: 'bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300',
     },
   ];
 
   return (
     <nav
-      className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around shrink-0 z-30"
-      aria-label="Navegação móvel"
+      className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-800 px-2 py-2 flex items-center justify-between gap-1 shrink-0 z-30 overflow-x-auto scrollbar-none"
+      aria-label="Navegação móvel por categorias"
     >
       {tabs.map((tab) => {
-        const Icon = tab.icon;
         const isActive = currentFilter === tab.id;
         return (
           <button
             key={tab.id}
             onClick={() => onSelectFilter(tab.id)}
-            className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all relative cursor-pointer ${
-              isActive ? tab.activeColor : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+            className={`flex-1 py-2 px-1.5 rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 whitespace-nowrap text-xs ${
+              isActive ? tab.activeStyle : tab.inactiveStyle
             }`}
             aria-label={`${tab.label} (${tab.count} anotações)`}
           >
-            <div className="relative">
-              <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.4]' : 'stroke-[1.8]'}`} />
-              {tab.count > 0 && (
-                <span
-                  className={`absolute -top-1 -right-2 px-1 text-[9px] font-bold rounded-full leading-tight min-w-[14px] text-center ${tab.badgeBg}`}
-                >
-                  {tab.count}
-                </span>
-              )}
-            </div>
-            <span className={`text-[10px] mt-1 font-semibold tracking-tight ${isActive ? 'font-bold' : ''}`}>
-              {tab.label}
+            <span className="tracking-tight">{tab.label}</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                isActive ? tab.badgeActive : tab.badgeInactive
+              }`}
+            >
+              {tab.count}
             </span>
           </button>
         );

@@ -5,6 +5,7 @@ import { MobileStatusBar } from './MobileStatusBar';
 interface PhoneSimulatorProps {
   children: React.ReactNode;
   isPhoneMode: boolean;
+  darkMode: boolean;
   onTogglePhoneMode: () => void;
   onOpenJavaModal: () => void;
 }
@@ -12,12 +13,13 @@ interface PhoneSimulatorProps {
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   children,
   isPhoneMode,
+  darkMode,
   onTogglePhoneMode,
   onOpenJavaModal,
 }) => {
   if (!isPhoneMode) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-950">
+      <div className={`min-h-screen flex flex-col ${darkMode ? 'dark bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'}`}>
         {/* Top Control Bar */}
         <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-50">
           <div className="flex items-center gap-2">
@@ -52,7 +54,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-indigo-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 flex flex-col items-center justify-center p-2 sm:p-6 select-none sm:select-auto">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-indigo-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 flex flex-col items-center justify-center p-2 sm:p-6 select-none sm:select-auto ${darkMode ? 'dark' : ''}`}>
       
       {/* Outer Floating Bar */}
       <header className="mb-3 sm:mb-4 w-full max-w-md flex items-center justify-between gap-2 px-3 py-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-md">
@@ -98,7 +100,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
         <div className="absolute -right-[9px] top-36 w-1 h-14 bg-slate-800 rounded-r-md hidden sm:block" />
 
         {/* Smartphone Screen Inner Display */}
-        <div className="relative w-full h-full bg-slate-50 dark:bg-slate-950 rounded-[40px] overflow-hidden flex flex-col border border-slate-800/40 shadow-inner">
+        <div className={`relative w-full h-full rounded-[40px] overflow-hidden flex flex-col border border-slate-800/40 shadow-inner ${darkMode ? 'dark bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
           
           {/* Mobile Status Bar */}
           <MobileStatusBar />

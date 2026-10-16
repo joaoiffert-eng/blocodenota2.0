@@ -68,13 +68,15 @@ export default function App() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync dark mode class on document element
+  // Sync dark mode class on document element & body
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
       saveStoredTheme('dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
       saveStoredTheme('light');
     }
   }, [darkMode]);
@@ -311,6 +313,7 @@ export default function App() {
     return (
       <PhoneSimulator
         isPhoneMode={isPhoneMode}
+        darkMode={darkMode}
         onTogglePhoneMode={() => setIsPhoneMode(!isPhoneMode)}
         onOpenJavaModal={() => setIsJavaModalOpen(true)}
       >
@@ -320,7 +323,7 @@ export default function App() {
           </div>
           <h2 className="text-xl font-bold mb-2 text-white">App Encerrado</h2>
           <p className="text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed max-w-xs">
-            Suas {notes.length} anotações continuam salvas no dispositivo via SQLite/armazenamento local.
+            Suas {notes.length} anotações continuam salvas no dispositivo com segurança via SQLite/armazenamento local.
           </p>
           <button
             onClick={() => setCurrentView('list-view')}
@@ -336,7 +339,7 @@ export default function App() {
 
   // Inside Phone Screen Content
   const phoneScreenContent = (
-    <div className={`h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 ${textSizeClass}`}>
+    <div className={`h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 relative ${textSizeClass} ${darkMode ? 'dark' : ''}`}>
       
       {/* Top Mobile App Bar */}
       <MobileHeader
@@ -391,37 +394,34 @@ export default function App() {
 
               <button
                 onClick={() => setCurrentFilter('estudos')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border flex items-center gap-1 cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
                   currentFilter === 'estudos'
                     ? 'bg-blue-600 text-white border-transparent shadow-sm shadow-blue-500/20'
                     : 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-900'
                 }`}
               >
-                <GraduationCap className="w-3 h-3" />
                 Estudos ({notes.filter((n) => n.category === 'estudos').length})
               </button>
 
               <button
                 onClick={() => setCurrentFilter('trabalho')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border flex items-center gap-1 cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
                   currentFilter === 'trabalho'
                     ? 'bg-emerald-600 text-white border-transparent shadow-sm shadow-emerald-500/20'
                     : 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'
                 }`}
               >
-                <Briefcase className="w-3 h-3" />
                 Trabalho ({notes.filter((n) => n.category === 'trabalho').length})
               </button>
 
               <button
                 onClick={() => setCurrentFilter('pessoal')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border flex items-center gap-1 cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer ${
                   currentFilter === 'pessoal'
                     ? 'bg-purple-600 text-white border-transparent shadow-sm shadow-purple-500/20'
                     : 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-900'
                 }`}
               >
-                <HeartHandshake className="w-3 h-3" />
                 Pessoal ({notes.filter((n) => n.category === 'pessoal').length})
               </button>
             </div>
@@ -500,6 +500,7 @@ export default function App() {
     <>
       <PhoneSimulator
         isPhoneMode={isPhoneMode}
+        darkMode={darkMode}
         onTogglePhoneMode={() => setIsPhoneMode(!isPhoneMode)}
         onOpenJavaModal={() => setIsJavaModalOpen(true)}
       >

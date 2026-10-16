@@ -76,7 +76,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         aria-label={`Anotação: ${note.title}, Categoria: ${categoryConfig.label}`}
       >
         <div className="flex-1 min-w-0 pr-2">
-          <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${categoryConfig.badgeClass}`}
             >
@@ -107,7 +107,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
 
         {/* Buttons */}
         <div 
-          className="flex items-center gap-1 sm:gap-2 shrink-0 self-end sm:self-center"
+          className="flex items-center gap-1 shrink-0 self-end sm:self-center"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -219,7 +219,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         </h3>
 
         {/* Content Preview */}
-        <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-4 leading-relaxed mb-4 whitespace-pre-line font-normal">
+        <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed mb-4 whitespace-pre-line font-normal">
           {note.content}
         </p>
       </div>
