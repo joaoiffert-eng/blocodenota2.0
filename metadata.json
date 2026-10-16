@@ -1,0 +1,6 @@
+{
+  "name": "Bloco de Notas Moderno & Acessível",
+  "description": "Aplicativo de anotações moderno, intuitivo e acessível com organização por categorias (Estudos, Trabalho, Pessoal), favoritos, pesquisa ágil, modo escuro e armazenamento local.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
