@@ -37,7 +37,8 @@ import {
   ShieldCheck, 
   Download,
   X,
-  Smartphone
+  Smartphone,
+  FolderArchive
 } from 'lucide-react';
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
   const [isJavaModalOpen, setIsJavaModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const [showInstallBanner, setShowInstallBanner] = useState(true);
+  const [showAndroidBanner, setShowAndroidBanner] = useState(true);
 
   // PWA install status
   const { isInstalled, isInstallable } = usePWAInstall();
@@ -423,6 +425,41 @@ export default function App() {
               </div>
             )}
 
+            {/* Android Studio Ready Banner */}
+            {showAndroidBanner && (
+              <div className="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex items-center justify-between gap-2 shadow-xs shrink-0 animate-in fade-in duration-150">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Smartphone className="w-4 h-4" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate flex items-center gap-1.5">
+                      <span>Android Studio Pronto</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300 font-extrabold border border-amber-500/30">JAVA</span>
+                    </p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      Projeto completo (.ZIP) para importar e rodar
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setIsJavaModalOpen(true)}
+                    className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                  >
+                    Importar
+                  </button>
+                  <button
+                    onClick={() => setShowAndroidBanner(false)}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    aria-label="Dispensar aviso Android"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Quick Category Filter Badges */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none">
               <button
@@ -607,6 +644,43 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setShowInstallBanner(false)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    aria-label="Dispensar aviso"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Android Studio Banner in Desktop */}
+            {showAndroidBanner && (
+              <div className="p-4 rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-emerald-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in duration-150">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-500/20">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <span>Projeto Completo em Java para Android Studio</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">PRONTO PARA IMPORTAR</span>
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      Estrutura oficial com Gradle, SQLite, Activities, Adapter e Layouts XML para compilar e gerar o arquivo APK.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsJavaModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <FolderArchive className="w-4 h-4" />
+                    <span>Importar no Android Studio (.ZIP)</span>
+                  </button>
+                  <button
+                    onClick={() => setShowAndroidBanner(false)}
                     className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                     aria-label="Dispensar aviso"
                   >

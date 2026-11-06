@@ -11,7 +11,10 @@ import {
   Coffee,
   Terminal,
   Layers,
-  Sparkles
+  Sparkles,
+  ExternalLink,
+  FolderTree,
+  Play
 } from 'lucide-react';
 import { JAVA_PROJECT_FILES, JavaProjectFile } from '../data/javaCodeFiles';
 import JSZip from 'jszip';
@@ -22,21 +25,27 @@ interface JavaCodeModalProps {
   onShowToast: (msg: string, type?: 'success' | 'info') => void;
 }
 
+type CategoryType = 'all' | 'android_java' | 'android_res' | 'android_config' | 'pure_java';
+
 export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
   isOpen,
   onClose,
   onShowToast,
 }) => {
-  const [selectedFile, setSelectedFile] = useState<JavaProjectFile>(JAVA_PROJECT_FILES[0]);
-  const [activeCategory, setActiveCategory] = useState<'all' | 'pure_java' | 'android'>('all');
+  const [selectedFile, setSelectedFile] = useState<JavaProjectFile>(
+    JAVA_PROJECT_FILES.find((f) => f.name === 'MainActivity.java') || JAVA_PROJECT_FILES[0]
+  );
+  const [activeCategory, setActiveCategory] = useState<CategoryType>('all');
   const [copied, setCopied] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
 
   if (!isOpen) return null;
 
   const filteredFiles = JAVA_PROJECT_FILES.filter((f) => {
+    if (activeCategory === 'android_java') return f.category === 'android_java';
+    if (activeCategory === 'android_res') return f.category === 'android_res';
+    if (activeCategory === 'android_config') return f.category === 'android_config';
     if (activeCategory === 'pure_java') return f.category === 'pure_java';
-    if (activeCategory === 'android') return f.category === 'android';
     return true;
   });
 
@@ -65,51 +74,74 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
       setIsZipping(true);
       const zip = new JSZip();
 
-      // README com instruções detalhadas
+      // README com instruções detalhadas para o Android Studio
       zip.file(
-        'README.txt',
+        'INSTRUCOES_ANDROID_STUDIO.txt',
         `==============================================================================
-BLOCO DE NOTAS MODERNO & ACESSÍVEL EM JAVA (CELULAR E ANDROID)
+BLOCO DE NOTAS MODERNO & ACESSÍVEL - PROJETO ANDROID STUDIO (JAVA)
 ==============================================================================
 
-Este pacote contém 2 formas de utilizar o aplicativo em Java:
+Como importar e rodar este projeto no Android Studio:
 
-------------------------------------------------------------------------------
-OPÇÃO 1: JAVA PURO EXECUTÁVEL (BlocoDeNotasApp.java)
-------------------------------------------------------------------------------
-Arquivo autônomo com interface gráfica idêntica a um celular (Swing/AWT),
-com suporte a modo escuro, categorias, favoritos, pesquisa e salvamento local.
+1. DESCOMPACTAR O ARQUIVO:
+   Extraia todo o conteúdo deste arquivo .zip em uma pasta de sua preferência
+   (por exemplo: C:\\Projetos\\BlocoDeNotas ou ~/Projetos/BlocoDeNotas).
 
-Como executar em qualquer computador com Java instalado:
-  1. Abra o terminal na pasta deste arquivo.
-  2. Compile:
-       javac BlocoDeNotasApp.java
-  3. Execute:
-       java BlocoDeNotasApp
+2. ABRIR NO ANDROID STUDIO:
+   - Abra o Android Studio.
+   - Na tela inicial, clique em "Open" (ou vá em File > Open se já estiver com outro projeto aberto).
+   - Navegue até a pasta onde descompactou os arquivos (onde estão os arquivos 'settings.gradle' e 'build.gradle').
+   - Selecione a pasta e clique em "OK".
 
-------------------------------------------------------------------------------
-OPÇÃO 2: PROJETO NATIVO ANDROID STUDIO (PASTA app/)
-------------------------------------------------------------------------------
-Código Java completo para criar o aplicativo nativo (.APK) para instalar
-no celular Android:
-  - Model: Note.java
-  - Database: NoteDatabaseHelper.java (SQLite Local)
-  - Activities: MainActivity.java, NoteEditorActivity.java, NoteViewerActivity.java
-  - Adapter: NoteAdapter.java
-  - Layouts XML com Material Design: activity_main.xml, activity_editor.xml,
-    activity_viewer.xml, item_note.xml, colors.xml
-  - AndroidManifest.xml e build.gradle prontos
+3. SINCRONIZAÇÃO DO GRADLE:
+   - O Android Studio detectará automaticamente o projeto Gradle e fará o download
+     das dependências necessárias (Material Design, RecyclerView, etc.).
+   - Aguarde a barra de progresso inferior finalizar o "Gradle sync finished".
 
-Como abrir no Android Studio:
-  1. Abra o Android Studio e escolha "Open" ou importe a pasta.
-  2. Clique no botão "Run" (ícone verde de play) para rodar no seu celular via USB
-     ou no Emulador.
-  3. Para gerar o instalador do celular, vá em Build > Build Bundle(s) / APK(s) > Build APK(s).
+4. EXECUTAR NO CELULAR OU EMULADOR:
+   - Conecte seu celular Android via cabo USB (com Depuração USB ativada em Opções do Desenvolvedor)
+     OU selecione um Emulador Virtual (AVD).
+   - Clique no botão verde de "Run" (ícone de Play ▶ ou atalho Shift + F10).
+   - O app será instalado e aberto imediatamente no seu celular!
+
+5. GERAR O ARQUIVO INSTALADOR .APK:
+   - No menu superior do Android Studio, vá em:
+     Build > Build Bundle(s) / APK(s) > Build APK(s)
+   - Ao finalizar, clique em "locate" para pegar o arquivo 'app-debug.apk'
+     e enviar diretamente para qualquer celular Android via WhatsApp, e-mail ou USB.
+
+==============================================================================
+ESTRUTURA DOS ARQUIVOS INCLUÍDOS:
+==============================================================================
+- settings.gradle                         -> Configuração de módulos
+- build.gradle                            -> Gradle raiz do projeto
+- gradle.properties                       -> Parâmetros AndroidX
+- gradle/wrapper/gradle-wrapper.properties-> Wrapper Gradle 8.2
+- app/build.gradle                        -> Configuração do módulo :app
+- app/src/main/AndroidManifest.xml        -> Manifesto e Activities
+- app/src/main/java/com/blocodenotas/app/
+    ├── MainActivity.java                 -> Tela principal, busca e categorias
+    ├── NoteEditorActivity.java           -> Criação e edição de notas
+    ├── NoteViewerActivity.java           -> Leitura completa e ações
+    ├── model/Note.java                   -> Modelo da anotação
+    ├── database/NoteDatabaseHelper.java  -> Banco SQLite offline
+    └── adapter/NoteAdapter.java          -> Renderizador dos cartões modernos
+- app/src/main/res/
+    ├── layout/activity_main.xml          -> Layout da tela inicial
+    ├── layout/activity_editor.xml        -> Layout da tela de edição
+    ├── layout/activity_viewer.xml        -> Layout da tela de leitura
+    ├── layout/item_note.xml              -> Layout de cada cartão de nota
+    ├── menu/bottom_nav_menu.xml          -> Menu da barra inferior (Categorias)
+    ├── values/colors.xml                 -> Paleta: Azul, Verde, Lilás e Branco
+    ├── values/strings.xml                -> Textos em português
+    ├── values/themes.xml                 -> Tema claro Material Design
+    └── values-night/themes.xml           -> Tema escuro (Modo Noturno)
+- BlocoDeNotasApp.java                    -> Versão Java puro executável via terminal
 ==============================================================================
 `
       );
 
-      // Adicionar todos os arquivos com os caminhos corretos
+      // Adicionar todos os arquivos com os caminhos relativos de projeto Android
       JAVA_PROJECT_FILES.forEach((f) => {
         zip.file(f.path, f.content);
       });
@@ -118,13 +150,13 @@ Como abrir no Android Studio:
       const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'BlocoDeNotas_Completo_Java.zip';
+      link.download = 'BlocoDeNotas_AndroidStudio_Java.zip';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      onShowToast('Pacote completo em Java (.ZIP) baixado com sucesso!', 'success');
+      onShowToast('Projeto Android Studio completo (.ZIP) baixado com sucesso!', 'success');
     } catch (err) {
       console.error(err);
       onShowToast('Erro ao compactar o arquivo zip.', 'info');
@@ -133,57 +165,45 @@ Como abrir no Android Studio:
     }
   };
 
-  const pureJavaFile = JAVA_PROJECT_FILES.find((f) => f.name === 'BlocoDeNotasApp.java') || JAVA_PROJECT_FILES[0];
-
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="java-modal-title"
     >
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full h-[92vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full h-[94vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden">
         
         {/* Modal Header */}
         <div className="px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-900/95 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-red-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20 shrink-0">
-              <Code2 className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
+              <Smartphone className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 id="java-modal-title" className="text-sm sm:text-base font-bold text-white leading-tight">
-                  Código do Bloco de Notas em Java
+                  Projeto Pronto para Importar no Android Studio
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  Java Puro & Android Nativo
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Linguagem Java • Gradle • SQLite
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                Toda a lógica foi estruturada em Java: baixe o arquivo individual ou o projeto completo (.ZIP)
+                Estrutura oficial do Android Studio com Gradle, Manifest, Activities Java e layouts XML
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Quick Download BlocoDeNotasApp.java */}
-            <button
-              onClick={() => handleDownloadSingleFile(pureJavaFile)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-sm active:scale-95 cursor-pointer"
-              title="Baixar apenas o arquivo BlocoDeNotasApp.java executável"
-            >
-              <Coffee className="w-3.5 h-3.5 text-amber-900" />
-              <span>Baixar BlocoDeNotasApp.java</span>
-            </button>
-
-            {/* Download Full ZIP */}
+            {/* Primary Action: Download Full Android Studio ZIP */}
             <button
               onClick={handleDownloadZip}
               disabled={isZipping}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all active:scale-95 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 transition-all active:scale-95 shadow-md shadow-emerald-600/30 cursor-pointer disabled:opacity-50 ring-2 ring-emerald-500/20"
             >
               <FolderArchive className="w-4 h-4" />
-              <span>Baixar Tudo (.ZIP)</span>
+              <span>{isZipping ? 'Compactando...' : 'Baixar Projeto Android Studio (.ZIP)'}</span>
             </button>
 
             <button
@@ -196,19 +216,23 @@ Como abrir no Android Studio:
           </div>
         </div>
 
-        {/* Quick Instructions Banner */}
-        <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between gap-3 text-xs shrink-0 flex-wrap">
-          <div className="flex items-center gap-2 text-slate-300">
-            <Terminal className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Como rodar via terminal:</span>
-            <code className="px-2 py-0.5 bg-slate-800 rounded font-mono text-emerald-400 text-[11px] select-all">
-              javac BlocoDeNotasApp.java && java BlocoDeNotasApp
-            </code>
-          </div>
+        {/* Quick Android Studio Guide Step-by-Step */}
+        <div className="px-4 py-2.5 bg-slate-950/70 border-b border-slate-800/80 shrink-0">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-xs text-slate-300 flex-wrap">
+              <span className="inline-flex items-center gap-1 font-bold text-emerald-400">
+                <Play className="w-3.5 h-3.5 fill-emerald-400 text-emerald-400" />
+                Como Importar:
+              </span>
+              <span>1. Baixe o <strong>.ZIP</strong> e extraia</span>
+              <span className="text-slate-600">•</span>
+              <span>2. No Android Studio: <strong>File &gt; Open</strong> e selecione a pasta</span>
+              <span className="text-slate-600">•</span>
+              <span>3. Clique em <strong>Run (▶)</strong></span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-slate-400">Filtrar:</span>
-            <div className="inline-flex p-0.5 rounded-lg bg-slate-800 text-[11px]">
+            {/* Category Filter Pills */}
+            <div className="inline-flex p-0.5 rounded-lg bg-slate-800 text-[11px] shrink-0">
               <button
                 onClick={() => setActiveCategory('all')}
                 className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
@@ -218,20 +242,28 @@ Como abrir no Android Studio:
                 Todos ({JAVA_PROJECT_FILES.length})
               </button>
               <button
-                onClick={() => setActiveCategory('pure_java')}
+                onClick={() => setActiveCategory('android_java')}
                 className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
-                  activeCategory === 'pure_java' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
+                  activeCategory === 'android_java' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                ☕ Java Puro
+                ☕ Código Java
               </button>
               <button
-                onClick={() => setActiveCategory('android')}
+                onClick={() => setActiveCategory('android_res')}
                 className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
-                  activeCategory === 'android' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                  activeCategory === 'android_res' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                📱 Android Studio
+                🎨 Layouts XML
+              </button>
+              <button
+                onClick={() => setActiveCategory('android_config')}
+                className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
+                  activeCategory === 'android_config' ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                ⚙️ Gradle &amp; Manifest
               </button>
             </div>
           </div>
@@ -241,12 +273,17 @@ Como abrir no Android Studio:
         <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
           
           {/* Files Sidebar */}
-          <div className="w-full md:w-72 bg-slate-950/80 border-b md:border-b-0 md:border-r border-slate-800/80 p-2.5 overflow-y-auto shrink-0 flex md:flex-col gap-1 max-h-36 md:max-h-full">
+          <div className="w-full md:w-80 bg-slate-950/90 border-b md:border-b-0 md:border-r border-slate-800/80 p-2.5 overflow-y-auto shrink-0 flex md:flex-col gap-1 max-h-40 md:max-h-full">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-2 py-1 hidden md:block">
-              Arquivos ({filteredFiles.length})
+              Arquivos do Projeto ({filteredFiles.length})
             </span>
             {filteredFiles.map((file) => {
               const isSelected = selectedFile.name === file.name;
+              let badgeColor = 'text-blue-400';
+              if (file.category === 'android_java') badgeColor = 'text-amber-400';
+              else if (file.category === 'android_res') badgeColor = 'text-purple-400';
+              else if (file.category === 'android_config') badgeColor = 'text-emerald-400';
+
               return (
                 <button
                   key={file.name}
@@ -257,12 +294,13 @@ Como abrir no Android Studio:
                       : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
                   }`}
                 >
-                  {file.name.endsWith('.java') ? (
-                    <Coffee className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-amber-400'}`} />
-                  ) : (
-                    <FileCode className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-blue-400'}`} />
-                  )}
-                  <span className="truncate">{file.name}</span>
+                  <FileCode className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : badgeColor}`} />
+                  <div className="truncate flex-1">
+                    <p className="truncate leading-tight">{file.name}</p>
+                    <p className={`text-[10px] truncate ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>
+                      {file.path}
+                    </p>
+                  </div>
                 </button>
               );
             })}
@@ -273,14 +311,14 @@ Como abrir no Android Studio:
             {/* File info bar */}
             <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 text-xs shrink-0">
               <div className="truncate">
-                <span className="font-mono text-blue-400 font-semibold">{selectedFile.path}</span>
+                <span className="font-mono text-emerald-400 font-semibold">{selectedFile.path}</span>
                 <p className="text-[11px] text-slate-400 truncate mt-0.5">{selectedFile.description}</p>
               </div>
 
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={handleCopyCode}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95 text-xs"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copiado!' : 'Copiar'}</span>
@@ -288,7 +326,7 @@ Como abrir no Android Studio:
 
                 <button
                   onClick={() => handleDownloadSingleFile(selectedFile)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95 text-xs"
                   title="Baixar apenas este arquivo"
                 >
                   <Download className="w-3.5 h-3.5 text-emerald-400" />
@@ -298,7 +336,7 @@ Como abrir no Android Studio:
             </div>
 
             {/* Code Content Box */}
-            <div className="flex-1 overflow-auto p-4 font-mono text-xs text-slate-200 bg-slate-950/90 leading-relaxed selection:bg-blue-600 selection:text-white">
+            <div className="flex-1 overflow-auto p-4 font-mono text-xs text-slate-200 bg-slate-950/95 leading-relaxed selection:bg-blue-600 selection:text-white">
               <pre className="whitespace-pre">
                 <code>{selectedFile.content}</code>
               </pre>
@@ -312,10 +350,15 @@ Como abrir no Android Studio:
         <div className="px-5 py-2.5 border-t border-slate-800 bg-slate-950/90 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 shrink-0">
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Formato Celular • Categorias (Estudos, Trabalho, Pessoal) • Modo Escuro • SQLite / Arquivo Local</span>
+            <span>Configurado com Gradle 8.2 • SDK 34 • Material Components • SQLite Nativo</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-amber-400 font-semibold">100% Java</span>
+            <button
+              onClick={handleDownloadZip}
+              className="text-emerald-400 hover:text-emerald-300 font-semibold underline cursor-pointer"
+            >
+              Baixar .ZIP para Android Studio
+            </button>
           </div>
         </div>
 

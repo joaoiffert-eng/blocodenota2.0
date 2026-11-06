@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Bloco de Notas</string>
+    <string name="category_studies">Estudos</string>
+    <string name="category_work">Trabalho</string>
+    <string name="category_personal">Pessoal</string>
+    <string name="category_all">Todas</string>
+    <string name="category_favorites">Favoritos</string>
+</resources>

@@ -86,11 +86,11 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           <button
             onClick={onOpenJavaModal}
             className="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all border border-amber-500/20 cursor-pointer"
-            title="Ver código-fonte Android Java"
-            aria-label="Ver código Java"
+            title="Importar projeto no Android Studio (Java)"
+            aria-label="Importar no Android Studio"
           >
             <Code2 className="w-3 h-3" />
-            <span className="text-[10px]">Java</span>
+            <span className="text-[10px]">Android (Java)</span>
           </button>
 
           {/* Text Size */}
