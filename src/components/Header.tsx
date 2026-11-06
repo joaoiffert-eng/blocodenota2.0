@@ -9,7 +9,8 @@ import {
   BookOpen, 
   Type,
   Download,
-  Upload
+  Upload,
+  Smartphone
 } from 'lucide-react';
 import { TextSize } from '../types/note';
 
@@ -25,6 +26,7 @@ interface HeaderProps {
   onExportBackup: () => void;
   onImportBackup: (event: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  onOpenInstallModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -39,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   onExportBackup,
   onImportBackup,
   fileInputRef,
+  onOpenInstallModal,
 }) => {
   const textSizeLabels: Record<TextSize, string> = {
     normal: 'Texto: Normal (100%)',
@@ -101,6 +104,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Actions & Buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Install Button */}
+            {onOpenInstallModal && (
+              <button
+                onClick={onOpenInstallModal}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+                title="Instalar no Celular"
+                aria-label="Instalar no Celular"
+              >
+                <Smartphone className="w-4 h-4" />
+                <span className="hidden md:inline">Instalar no Celular</span>
+              </button>
+            )}
+
             {/* New Note Button */}
             <button
               onClick={onNewNote}

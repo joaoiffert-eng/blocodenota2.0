@@ -29,22 +29,26 @@ import { ExitConfirmModal } from './components/ExitConfirmModal';
 import { EmptyState } from './components/EmptyState';
 import { Toast, ToastMessage } from './components/Toast';
 import { JavaCodeModal } from './components/JavaCodeModal';
+import { InstallModal } from './components/InstallModal';
+import { usePWAInstall } from './hooks/usePWAInstall';
 import { 
-  GraduationCap, 
-  Briefcase, 
-  HeartHandshake, 
-  Sparkles, 
   Plus, 
   RefreshCw, 
   ShieldCheck, 
-  Code2,
-  Folder
+  Download,
+  X,
+  Smartphone
 } from 'lucide-react';
 
 export default function App() {
   // Mobile Frame View Mode (defaults to true as requested: "em formato de celular eu quero")
   const [isPhoneMode, setIsPhoneMode] = useState(true);
   const [isJavaModalOpen, setIsJavaModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [showInstallBanner, setShowInstallBanner] = useState(true);
+
+  // PWA install status
+  const { isInstalled, isInstallable } = usePWAInstall();
 
   // Core Data
   const [notes, setNotes] = useState<Note[]>(() => getStoredNotes());
@@ -121,7 +125,7 @@ export default function App() {
     }
   };
 
-  // Actions
+  // Actions: Notes
   const handleNewNote = () => {
     setSelectedNote(null);
     setCurrentView('editor-view');
@@ -144,30 +148,41 @@ export default function App() {
     isFavorite: boolean;
     isPinned: boolean;
   }) => {
+    const { title, content, category, isFavorite, isPinned } = noteData;
     const now = new Date().toISOString();
 
     if (selectedNote) {
-      // Editing existing note
+      // Update existing
       const updatedNote: Note = {
         ...selectedNote,
-        ...noteData,
+        title,
+        content,
+        category,
+        isFavorite,
+        isPinned,
         updatedAt: now,
       };
+
       setNotes((prev) => prev.map((n) => (n.id === updatedNote.id ? updatedNote : n)));
       setSelectedNote(updatedNote);
       showToast('Anotação atualizada com sucesso!', 'success');
       setCurrentView('reader-view');
     } else {
-      // Creating new note
+      // Create new
       const newNote: Note = {
-        id: 'note_' + Date.now(),
-        ...noteData,
+        id: 'note_' + Date.now().toString() + Math.random().toString(36).substring(2, 6),
+        title,
+        content,
+        category,
+        isFavorite,
+        isPinned,
         createdAt: now,
         updatedAt: now,
       };
+
       setNotes((prev) => [newNote, ...prev]);
       setSelectedNote(newNote);
-      showToast('Nova anotação salva com sucesso!', 'success');
+      showToast('Nova anotação criada com sucesso!', 'success');
       setCurrentView('reader-view');
     }
   };
@@ -178,56 +193,50 @@ export default function App() {
 
   const handleConfirmDelete = () => {
     if (!noteToDelete) return;
-    const deletedTitle = noteToDelete.title;
     setNotes((prev) => prev.filter((n) => n.id !== noteToDelete.id));
+    showToast(`"${noteToDelete.title}" foi excluída.`, 'info');
+    setNoteToDelete(null);
     if (selectedNote?.id === noteToDelete.id) {
       setSelectedNote(null);
       setCurrentView('list-view');
     }
-    setNoteToDelete(null);
-    showToast(`"${deletedTitle}" foi excluída.`, 'info');
   };
 
-  const handleToggleFavorite = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleFavorite = (noteId: string) => {
     setNotes((prev) =>
       prev.map((n) => {
-        if (n.id === id) {
+        if (n.id === noteId) {
           const nextFav = !n.isFavorite;
-          showToast(
-            nextFav ? 'Adicionada aos favoritos!' : 'Removida dos favoritos',
-            'info'
-          );
-          return { ...n, isFavorite: nextFav };
+          showToast(nextFav ? 'Adicionado aos favoritos' : 'Removido dos favoritos', 'info');
+          return { ...n, isFavorite: nextFav, updatedAt: new Date().toISOString() };
         }
         return n;
       })
     );
-    if (selectedNote?.id === id) {
+
+    if (selectedNote && selectedNote.id === noteId) {
       setSelectedNote((prev) => (prev ? { ...prev, isFavorite: !prev.isFavorite } : null));
     }
   };
 
-  const handleTogglePin = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleTogglePin = (noteId: string) => {
     setNotes((prev) =>
       prev.map((n) => {
-        if (n.id === id) {
+        if (n.id === noteId) {
           const nextPin = !n.isPinned;
-          showToast(
-            nextPin ? 'Anotação fixada no topo!' : 'Anotação desafixada',
-            'info'
-          );
-          return { ...n, isPinned: nextPin };
+          showToast(nextPin ? 'Anotação fixada no topo' : 'Anotação desfixada', 'info');
+          return { ...n, isPinned: nextPin, updatedAt: new Date().toISOString() };
         }
         return n;
       })
     );
-    if (selectedNote?.id === id) {
+
+    if (selectedNote && selectedNote.id === noteId) {
       setSelectedNote((prev) => (prev ? { ...prev, isPinned: !prev.isPinned } : null));
     }
   };
 
+  // Backup handlers
   const handleExportBackup = () => {
     exportNotesToFile(notes);
     showToast('Backup exportado com sucesso!', 'success');
@@ -240,11 +249,10 @@ export default function App() {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const content = e.target?.result as string;
-        const parsed = JSON.parse(content);
+        const parsed = JSON.parse(e.target?.result as string);
         if (Array.isArray(parsed)) {
           setNotes(parsed);
-          showToast(`${parsed.length} anotações restauradas!`, 'success');
+          showToast(`${parsed.length} anotações restauradas com sucesso!`, 'success');
         } else {
           showToast('Arquivo de backup inválido.', 'error');
         }
@@ -316,6 +324,7 @@ export default function App() {
         darkMode={darkMode}
         onTogglePhoneMode={() => setIsPhoneMode(!isPhoneMode)}
         onOpenJavaModal={() => setIsJavaModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
       >
         <div className="h-full bg-slate-900 text-slate-100 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 via-indigo-500 to-purple-500 flex items-center justify-center text-white mb-4 shadow-lg shadow-blue-500/30">
@@ -337,7 +346,7 @@ export default function App() {
     );
   }
 
-  // Inside Phone Screen Content
+  // Inside Phone Screen Content (Mobile Viewport)
   const phoneScreenContent = (
     <div className={`h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 relative ${textSizeClass} ${darkMode ? 'dark' : ''}`}>
       
@@ -350,6 +359,7 @@ export default function App() {
         textSize={textSize}
         onCycleTextSize={handleCycleTextSize}
         onOpenJavaModal={() => setIsJavaModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
         onOpenExitModal={() => setIsExitModalOpen(true)}
       />
 
@@ -379,6 +389,40 @@ export default function App() {
           />
         ) : (
           <div>
+            {/* Install Prompt Banner (Prominent & Clear) */}
+            {showInstallBanner && !isInstalled && (
+              <div className="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-blue-500/10 to-purple-500/10 border border-emerald-500/30 dark:border-emerald-500/40 flex items-center justify-between gap-2 shadow-xs shrink-0 animate-in fade-in duration-150">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Download className="w-4 h-4" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                      Instalar no Celular
+                    </p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      Ícone na tela inicial e funciona 100% offline
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setIsInstallModalOpen(true)}
+                    className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                  >
+                    Instalar
+                  </button>
+                  <button
+                    onClick={() => setShowInstallBanner(false)}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    aria-label="Dispensar aviso de instalação"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Quick Category Filter Badges */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none">
               <button
@@ -490,9 +534,148 @@ export default function App() {
         onConfirmExit={handleConfirmExit}
         onCancel={() => setIsExitModalOpen(false)}
       />
+    </div>
+  );
 
-      {/* Toast notifications */}
-      <Toast toasts={toasts} onDismiss={dismissToast} />
+  // Responsive Full Screen Content (Desktop / Tablet)
+  const fullScreenContent = (
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 flex flex-col ${textSizeClass} ${darkMode ? 'dark' : ''}`}>
+      <Header
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onNewNote={handleNewNote}
+        darkMode={darkMode}
+        onToggleTheme={handleToggleTheme}
+        textSize={textSize}
+        onCycleTextSize={handleCycleTextSize}
+        onOpenExitModal={() => setIsExitModalOpen(true)}
+        onExportBackup={handleExportBackup}
+        onImportBackup={handleImportBackup}
+        fileInputRef={fileInputRef}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
+      />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {currentView === 'editor-view' ? (
+          <NoteEditor
+            note={selectedNote}
+            onSave={handleSaveNote}
+            onBack={() => {
+              if (selectedNote) {
+                setCurrentView('reader-view');
+              } else {
+                setCurrentView('list-view');
+              }
+            }}
+          />
+        ) : currentView === 'reader-view' && selectedNote ? (
+          <NoteViewer
+            note={selectedNote}
+            onBack={() => setCurrentView('list-view')}
+            onEdit={handleEditNote}
+            onDelete={handleDeleteTrigger}
+            onToggleFavorite={handleToggleFavorite}
+            onTogglePin={handleTogglePin}
+            onShowToast={showToast}
+          />
+        ) : (
+          <div className="space-y-6">
+            {/* Install Prompt Banner */}
+            {showInstallBanner && !isInstalled && (
+              <div className="p-4 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border border-emerald-500/25 dark:border-emerald-500/35 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in duration-150">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      Instale o Bloco de Notas no seu Celular
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      Use direto da tela inicial do seu smartphone (Android ou iPhone) com funcionamento 100% offline.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsInstallModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Ver Como Instalar</span>
+                  </button>
+                  <button
+                    onClick={() => setShowInstallBanner(false)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    aria-label="Dispensar aviso"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Filter and Sort bar */}
+            <CategoryPills
+              currentFilter={currentFilter}
+              onSelectFilter={setCurrentFilter}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              notes={notes}
+            />
+
+            {/* Notes display */}
+            {filteredNotes.length === 0 ? (
+              <EmptyState
+                searchQuery={searchQuery}
+                currentFilter={currentFilter}
+                onClearSearch={() => setSearchQuery('')}
+                onNewNote={handleNewNote}
+              />
+            ) : (
+              <div
+                className={
+                  viewMode === 'grid'
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'
+                    : 'flex flex-col gap-3 max-w-4xl mx-auto'
+                }
+              >
+                {filteredNotes.map((note) => (
+                  <NoteCard
+                    key={note.id}
+                    note={note}
+                    viewMode={viewMode}
+                    onView={handleViewNote}
+                    onEdit={handleEditNote}
+                    onDelete={handleDeleteTrigger}
+                    onToggleFavorite={handleToggleFavorite}
+                    onTogglePin={handleTogglePin}
+                    searchQuery={searchQuery}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Modals for Desktop */}
+      <DeleteConfirmModal
+        note={noteToDelete}
+        isOpen={Boolean(noteToDelete)}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setNoteToDelete(null)}
+      />
+
+      <ExitConfirmModal
+        isOpen={isExitModalOpen}
+        totalNotes={notes.length}
+        onConfirmExit={handleConfirmExit}
+        onCancel={() => setIsExitModalOpen(false)}
+      />
     </div>
   );
 
@@ -503,16 +686,28 @@ export default function App() {
         darkMode={darkMode}
         onTogglePhoneMode={() => setIsPhoneMode(!isPhoneMode)}
         onOpenJavaModal={() => setIsJavaModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
       >
-        {phoneScreenContent}
+        {isPhoneMode ? phoneScreenContent : fullScreenContent}
       </PhoneSimulator>
 
-      {/* Java Code Modal (Available everywhere) */}
+      {/* Java Code Modal */}
       <JavaCodeModal
         isOpen={isJavaModalOpen}
         onClose={() => setIsJavaModalOpen(false)}
         onShowToast={showToast}
       />
+
+      {/* Install Mobile PWA Modal */}
+      <InstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        onOpenJavaModal={() => setIsJavaModalOpen(true)}
+        onShowToast={showToast}
+      />
+
+      {/* Global Toast notifications */}
+      <Toast toasts={toasts} onDismiss={dismissToast} />
     </>
   );
 }

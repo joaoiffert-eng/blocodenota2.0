@@ -1,5 +1,5 @@
 import React from 'react';
-import { Smartphone, Monitor, Code2, FolderArchive, Sparkles } from 'lucide-react';
+import { Smartphone, Monitor, Code2, Download, Sparkles } from 'lucide-react';
 import { MobileStatusBar } from './MobileStatusBar';
 
 interface PhoneSimulatorProps {
@@ -8,6 +8,7 @@ interface PhoneSimulatorProps {
   darkMode: boolean;
   onTogglePhoneMode: () => void;
   onOpenJavaModal: () => void;
+  onOpenInstallModal: () => void;
 }
 
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
@@ -16,12 +17,13 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   darkMode,
   onTogglePhoneMode,
   onOpenJavaModal,
+  onOpenInstallModal,
 }) => {
   if (!isPhoneMode) {
     return (
       <div className={`min-h-screen flex flex-col ${darkMode ? 'dark bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'}`}>
         {/* Top Control Bar */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-50">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-50">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-blue-500" />
@@ -30,6 +32,15 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Install button */}
+            <button
+              onClick={onOpenInstallModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Instalar no Celular</span>
+            </button>
+
             <button
               onClick={onOpenJavaModal}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold bg-amber-500 text-white hover:bg-amber-600 transition-all shadow-sm active:scale-95 cursor-pointer"
@@ -57,7 +68,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
     <div className={`min-h-screen bg-gradient-to-br from-slate-200 via-slate-100 to-indigo-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 flex flex-col items-center justify-center p-2 sm:p-6 select-none sm:select-auto ${darkMode ? 'dark' : ''}`}>
       
       {/* Outer Floating Bar */}
-      <header className="mb-3 sm:mb-4 w-full max-w-md flex items-center justify-between gap-2 px-3 py-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-md">
+      <header className="mb-3 sm:mb-4 w-full max-w-md flex items-center justify-between gap-2 px-3 py-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-md">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
@@ -69,13 +80,23 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Prominent Install Button */}
+          <button
+            onClick={onOpenInstallModal}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all active:scale-95 cursor-pointer ring-2 ring-emerald-500/20"
+            title="Instalar aplicativo no seu celular"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Instalar</span>
+          </button>
+
           <button
             onClick={onOpenJavaModal}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition-all active:scale-95 cursor-pointer"
             title="Abrir arquivos Java para Android Studio"
           >
             <Code2 className="w-3.5 h-3.5" />
-            <span>Código Java</span>
+            <span>Java</span>
           </button>
 
           <button
@@ -120,9 +141,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
       </div>
 
       {/* Hint underneath simulator */}
-      <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-400 text-center hidden sm:block">
-        💡 Toque e navegue como em um smartphone real. O código fonte completo está disponível no botão <strong>Código Java</strong>.
-      </p>
+      <div className="mt-2.5 flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 text-center hidden sm:flex">
+        <span>💡 Toque em <strong>Instalar</strong> para colocar o app na tela inicial do seu celular.</span>
+      </div>
 
     </div>
   );

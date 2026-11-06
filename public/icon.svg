@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="pageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-opacity="0.3" flood-color="#0f172a"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Notepad Body -->
+  <g filter="url(#shadow)">
+    <!-- Main Paper Card -->
+    <rect x="96" y="80" width="320" height="352" rx="28" fill="url(#pageGrad)" />
+    
+    <!-- Top Binding Header (Lilac/Blue) -->
+    <path d="M 96 108 C 96 92.536 108.536 80 124 80 L 388 80 C 403.464 80 416 92.536 416 108 L 416 140 L 96 140 Z" fill="#4f46e5" />
+    
+    <!-- Spiral / Rings dots -->
+    <circle cx="156" cy="110" r="10" fill="#ffffff" />
+    <circle cx="216" cy="110" r="10" fill="#ffffff" />
+    <circle cx="276" cy="110" r="10" fill="#ffffff" />
+    <circle cx="336" cy="110" r="10" fill="#ffffff" />
+    <circle cx="396" cy="110" r="10" fill="#ffffff" />
+
+    <!-- Ruled / Note Content Lines (Category accents: Blue, Green, Lilac) -->
+    <!-- Line 1: Blue Study bar -->
+    <rect x="136" y="180" width="160" height="20" rx="8" fill="#2563eb" />
+    <rect x="312" y="180" width="64" height="20" rx="8" fill="#93c5fd" />
+
+    <!-- Line 2: Green Work bar -->
+    <rect x="136" y="226" width="240" height="14" rx="7" fill="#cbd5e1" />
+    <rect x="136" y="260" width="180" height="14" rx="7" fill="#e2e8f0" />
+
+    <!-- Line 3: Lilac / Purple check -->
+    <rect x="136" y="294" width="220" height="14" rx="7" fill="#cbd5e1" />
+
+    <!-- Floating colorful badge on note -->
+    <g transform="translate(290, 310)">
+      <rect width="104" height="42" rx="14" fill="#10b981" />
+      <text x="52" y="26" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">NOTAS</text>
+    </g>
+
+    <!-- Star / Favorite Accent -->
+    <path d="M 156 348 L 163 362 L 178 364 L 167 375 L 170 390 L 156 382 L 142 390 L 145 375 L 134 364 L 149 362 Z" fill="#f59e0b" />
+  </g>
+
+  <!-- Pen Icon hovering -->
+  <g transform="translate(330, 240) rotate(-25)">
+    <rect x="0" y="0" width="28" height="120" rx="14" fill="#7c3aed" />
+    <path d="M 0 110 L 14 135 L 28 110 Z" fill="#f59e0b" />
+    <circle cx="14" cy="132" r="3" fill="#1e1b4b" />
+  </g>
+</svg>

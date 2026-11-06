@@ -7,7 +7,8 @@ import {
   Moon, 
   LogOut, 
   Code2, 
-  Type
+  Type,
+  Download
 } from 'lucide-react';
 import { TextSize } from '../types/note';
 
@@ -19,6 +20,7 @@ interface MobileHeaderProps {
   textSize: TextSize;
   onCycleTextSize: () => void;
   onOpenJavaModal: () => void;
+  onOpenInstallModal: () => void;
   onOpenExitModal: () => void;
 }
 
@@ -30,30 +32,31 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   textSize,
   onCycleTextSize,
   onOpenJavaModal,
+  onOpenInstallModal,
   onOpenExitModal,
 }) => {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 pt-1.5 pb-2.5 shrink-0 z-20">
-      <div className="flex items-center justify-between gap-2">
+    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 pt-1.5 pb-2 shrink-0 z-20">
+      <div className="flex items-center justify-between gap-1.5">
         {/* App Logo & Title */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-500 p-0.5 shadow-sm flex items-center justify-center text-white shrink-0">
-            <BookOpen className="w-4 h-4" />
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-500 p-0.5 shadow-sm flex items-center justify-center text-white shrink-0">
+            <BookOpen className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+            <h1 className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
               Bloco de Notas
             </h1>
-            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
               Java • Acessível
             </span>
           </div>
         </div>
 
         {/* Action icons */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {/* Toggle search */}
           <button
             onClick={() => setShowSearch(!showSearch)}
@@ -65,18 +68,29 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             title="Buscar"
             aria-label="Abrir busca"
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Install Button in Mobile Header */}
+          <button
+            onClick={onOpenInstallModal}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 text-xs font-bold transition-all border border-emerald-500/30 cursor-pointer shadow-xs active:scale-95"
+            title="Instalar no Celular"
+            aria-label="Instalar no Celular"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-[11px]">Instalar</span>
           </button>
 
           {/* Java Code Button */}
           <button
             onClick={onOpenJavaModal}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all border border-amber-500/20 cursor-pointer"
+            className="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all border border-amber-500/20 cursor-pointer"
             title="Ver código-fonte Android Java"
             aria-label="Ver código Java"
           >
-            <Code2 className="w-3.5 h-3.5" />
-            <span className="text-[11px]">Java</span>
+            <Code2 className="w-3 h-3" />
+            <span className="text-[10px]">Java</span>
           </button>
 
           {/* Text Size */}
@@ -86,7 +100,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             title="Alterar tamanho do texto"
             aria-label="Alterar tamanho do texto"
           >
-            <Type className="w-4 h-4 text-purple-500" />
+            <Type className="w-3.5 h-3.5 text-purple-500" />
           </button>
 
           {/* Theme */}
@@ -96,7 +110,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             title={darkMode ? 'Modo Claro' : 'Modo Escuro'}
             aria-label="Alternar tema claro/escuro"
           >
-            {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+            {darkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
           </button>
 
           {/* Exit */}
@@ -106,7 +120,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             title="Sair"
             aria-label="Sair"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
