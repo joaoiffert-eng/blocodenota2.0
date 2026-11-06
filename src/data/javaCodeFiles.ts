@@ -2,1077 +2,122 @@ export interface JavaProjectFile {
   name: string;
   path: string;
   language: 'java' | 'xml' | 'groovy';
+  category?: 'pure_java' | 'android';
   description: string;
   content: string;
 }
 
 export const JAVA_PROJECT_FILES: JavaProjectFile[] = [
   {
-    name: 'Note.java',
-    path: 'app/src/main/java/com/blocodenotas/app/model/Note.java',
-    language: 'java',
-    description: 'Classe de modelo que representa uma anotação',
-    content: `package com.blocodenotas.app.model;
-
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-public class Note implements Serializable {
-    private long id;
-    private String title;
-    private String content;
-    private String category; // "estudos", "trabalho", "pessoal"
-    private boolean isFavorite;
-    private boolean isPinned;
-    private boolean isLocked;
-    private long createdAt;
-    private long updatedAt;
-
-    public Note() {
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
-        this.category = "estudos";
-        this.isFavorite = false;
-        this.isPinned = false;
-        this.isLocked = false;
-    }
-
-    public Note(String title, String content, String category) {
-        this();
-        this.title = title;
-        this.content = content;
-        this.category = category;
-    }
-
-    // Getters and Setters
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { 
-        this.title = title; 
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public String getContent() { return content; }
-    public void setContent(String content) { 
-        this.content = content; 
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
-
-    public boolean isFavorite() { return isFavorite; }
-    public void setFavorite(boolean favorite) { isFavorite = favorite; }
-
-    public boolean isPinned() { return isPinned; }
-    public void setPinned(boolean pinned) { isPinned = pinned; }
-
-    public long getCreatedAt() { return createdAt; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
-
-    public long getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
-
-    public String getFormattedDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-        return sdf.format(new Date(this.updatedAt));
-    }
-}
-`,
+    "name": "BlocoDeNotasApp.java",
+    "path": "BlocoDeNotasApp.java",
+    "language": "java",
+    "category": "pure_java",
+    "description": "Aplicativo Java puro completo (Swing/AWT) no formato celular executável via terminal com javac e java",
+    "content": "import java.awt.*;\nimport java.awt.event.*;\nimport java.io.*;\nimport java.text.SimpleDateFormat;\nimport java.util.*;\nimport java.util.List;\nimport javax.swing.*;\nimport javax.swing.border.*;\n\n/**\n * ==============================================================================\n * BLOCO DE NOTAS MODERNO & ACESSÍVEL EM JAVA (FORMATO CELULAR)\n * ==============================================================================\n * \n * Aplicativo completo desenvolvido em Java puro (Swing/AWT) com:\n *  - Formato e proporção de Celular / Smartphone (420 x 780 px)\n *  - Paleta de cores moderna: Azul (#2563EB), Verde (#059669), Lilás (#7C3AED) e Branco\n *  - Categorias: Estudos, Trabalho e Pessoal\n *  - Favoritos (marcar / desmarcar) e Fixar no topo\n *  - Pesquisa em tempo real por título ou conteúdo\n *  - Modo Escuro (Dark Mode) e Modo Claro\n *  - Diálogo de confirmação para Excluir e para Sair\n *  - Armazenamento persistente automático em arquivo local (100% offline)\n *\n * Como compilar e executar em qualquer computador com Java:\n *   1. javac BlocoDeNotasApp.java\n *   2. java BlocoDeNotasApp\n * ==============================================================================\n */\npublic class BlocoDeNotasApp extends JFrame {\n\n    // Modelo de Anotação\n    public static class Nota implements Serializable {\n        private static final long serialVersionUID = 1L;\n        private String id;\n        private String titulo;\n        private String conteudo;\n        private String categoria; // \"estudos\", \"trabalho\", \"pessoal\"\n        private boolean favorito;\n        private boolean fixado;\n        private long atualizadoEm;\n\n        public Nota(String titulo, String conteudo, String categoria) {\n            this.id = UUID.randomUUID().toString();\n            this.titulo = titulo;\n            this.conteudo = conteudo;\n            this.categoria = categoria;\n            this.favorito = false;\n            this.fixado = false;\n            this.atualizadoEm = System.currentTimeMillis();\n        }\n\n        public String getId() { return id; }\n        public String getTitulo() { return titulo; }\n        public void setTitulo(String t) { this.titulo = t; this.atualizadoEm = System.currentTimeMillis(); }\n        public String getConteudo() { return conteudo; }\n        public void setConteudo(String c) { this.conteudo = c; this.atualizadoEm = System.currentTimeMillis(); }\n        public String getCategoria() { return categoria; }\n        public void setCategoria(String cat) { this.categoria = cat; }\n        public boolean isFavorito() { return favorito; }\n        public void setFavorito(boolean f) { this.favorito = f; }\n        public boolean isFixado() { return fixado; }\n        public void setFixado(boolean fix) { this.fixado = fix; }\n        public long getAtualizadoEm() { return atualizadoEm; }\n\n        public String getDataFormatada() {\n            SimpleDateFormat sdf = new SimpleDateFormat(\"dd/MM/yyyy HH:mm\", Locale.getDefault());\n            return sdf.format(new Date(this.atualizadoEm));\n        }\n    }\n\n    // Gerenciador de Persistência Local (Arquivo .txt simples)\n    public static class BancoNotas {\n        private static final String ARQUIVO = \"bloco_de_notas_dados.txt\";\n\n        public static List<Nota> carregar() {\n            List<Nota> lista = new ArrayList<>();\n            File file = new File(ARQUIVO);\n            if (!file.exists()) {\n                // Notas de exemplo iniciais\n                Nota n1 = new Nota(\"Resumo de Biologia: Estrutura Celular\",\n                        \"Principais tópicos para a prova:\\n1. Membrana Plasmática e permeabilidade seletiva.\\n2. Mitocôndrias e respiração celular.\\n3. Retículo Endoplasmático e Complexo de Golgi.\\n\\n📌 Revisar o ciclo de Krebs!\",\n                        \"estudos\");\n                n1.setFavorito(true);\n                n1.setFixado(true);\n\n                Nota n2 = new Nota(\"Metas do Projeto: Trimestre 4\",\n                        \"[X] Alinhamento com equipe de design\\n[X] Paleta moderna (Azul, Verde e Lilás)\\n[ ] Apresentação de resultados na sexta-feira às 14h\\n[ ] Entrega final do relatório\",\n                        \"trabalho\");\n                n2.setFavorito(true);\n\n                Nota n3 = new Nota(\"Livros & Hábitos Saudáveis\",\n                        \"1. Ler 20 páginas por dia.\\n2. Tomar 2 litros de água.\\n3. Caminhada matinal de 30 minutos.\",\n                        \"pessoal\");\n\n                lista.add(n1);\n                lista.add(n2);\n                lista.add(n3);\n                salvar(lista);\n                return lista;\n            }\n\n            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), \"UTF-8\"))) {\n                String line;\n                while ((line = reader.readLine()) != null) {\n                    if (line.trim().isEmpty()) continue;\n                    String[] parts = line.split(\"###\", -1);\n                    if (parts.length >= 7) {\n                        Nota n = new Nota(parts[1], parts[2].replace(\"<NL>\", \"\\n\"), parts[3]);\n                        n.id = parts[0];\n                        n.favorito = Boolean.parseBoolean(parts[4]);\n                        n.fixado = Boolean.parseBoolean(parts[5]);\n                        try { n.atualizadoEm = Long.parseLong(parts[6]); } catch (Exception ignored) {}\n                        lista.add(n);\n                    }\n                }\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n            return lista;\n        }\n\n        public static void salvar(List<Nota> lista) {\n            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ARQUIVO), \"UTF-8\"))) {\n                for (Nota n : lista) {\n                    String conteudoFormatado = n.getConteudo().replace(\"\\n\", \"<NL>\").replace(\"\\r\", \"\");\n                    writer.write(n.getId() + \"###\" + n.getTitulo() + \"###\" + conteudoFormatado + \"###\" +\n                            n.getCategoria() + \"###\" + n.isFavorito() + \"###\" + n.isFixado() + \"###\" + n.getAtualizadoEm());\n                    writer.newLine();\n                }\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        }\n    }\n\n    // Cores do Tema Moderno (Azul, Verde, Lilás e Branco)\n    public static final Color COR_AZUL = new Color(37, 99, 235);\n    public static final Color COR_AZUL_CLARO = new Color(219, 234, 254);\n    public static final Color COR_VERDE = new Color(5, 150, 105);\n    public static final Color COR_VERDE_CLARO = new Color(209, 250, 229);\n    public static final Color COR_LILAS = new Color(124, 58, 237);\n    public static final Color COR_LILAS_CLARO = new Color(237, 233, 254);\n    public static final Color COR_AMARELO_FAV = new Color(245, 158, 11);\n\n    // Estado da Aplicação\n    private List<Nota> todasNotas = new ArrayList<>();\n    private boolean modoEscuro = false;\n    private String categoriaFiltro = \"todas\";\n    private String textoPesquisa = \"\";\n\n    // Componentes de Interface\n    private JPanel painelLista;\n    private JTextField campoPesquisa;\n    private JLabel labelStatus;\n    private JButton btnModoEscuro;\n    private JPanel painelContainer;\n    private JScrollPane scrollPane;\n\n    public BlocoDeNotasApp() {\n        super(\"Bloco de Notas • Java Mobile\");\n        todasNotas = BancoNotas.carregar();\n        configurarJanela();\n        construirInterface();\n        atualizarLista();\n    }\n\n    private void configurarJanela() {\n        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);\n        addWindowListener(new WindowAdapter() {\n            @Override\n            public void windowClosing(WindowEvent e) {\n                confirmarSaida();\n            }\n        });\n\n        // Formato Celular Realista (proporção 9:18 ~ 420x780 px)\n        setSize(430, 780);\n        setMinimumSize(new Dimension(380, 680));\n        setLocationRelativeTo(null);\n        setResizable(true);\n    }\n\n    private void construirInterface() {\n        painelContainer = new JPanel(new BorderLayout());\n        painelContainer.setBackground(getCorFundo());\n\n        // 1. Barra Superior do Celular (Dynamic Island & Status)\n        JPanel topoCelular = new JPanel(new BorderLayout());\n        topoCelular.setBackground(modoEscuro ? new Color(15, 23, 42) : Color.WHITE);\n        topoCelular.setBorder(new MatteBorder(0, 0, 1, 0, modoEscuro ? new Color(30, 41, 59) : new Color(226, 232, 240)));\n\n        // Notificação / Ícone e Título\n        JPanel painelHeader = new JPanel(new BorderLayout());\n        painelHeader.setOpaque(false);\n        painelHeader.setBorder(new EmptyBorder(10, 14, 8, 14));\n\n        JLabel lblTitulo = new JLabel(\"📱 Bloco de Notas\");\n        lblTitulo.setFont(new Font(\"Segoe UI\", Font.BOLD, 16));\n        lblTitulo.setForeground(modoEscuro ? Color.WHITE : new Color(15, 23, 42));\n\n        JLabel lblSub = new JLabel(\"Java Nativo • Acessível\");\n        lblSub.setFont(new Font(\"Segoe UI\", Font.PLAIN, 11));\n        lblSub.setForeground(COR_VERDE);\n\n        JPanel pnlTitulos = new JPanel(new GridLayout(2, 1));\n        pnlTitulos.setOpaque(false);\n        pnlTitulos.add(lblTitulo);\n        pnlTitulos.add(lblSub);\n\n        // Botões de Ação do Header (Modo Escuro, Sair)\n        JPanel acoesHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));\n        acoesHeader.setOpaque(false);\n\n        btnModoEscuro = criarBotaoRedondo(modoEscuro ? \"☀️ Claro\" : \"🌙 Escuro\", new Color(100, 116, 139));\n        btnModoEscuro.addActionListener(e -> alternarModoEscuro());\n\n        JButton btnSair = criarBotaoRedondo(\"🚪 Sair\", new Color(225, 29, 72));\n        btnSair.addActionListener(e -> confirmarSaida());\n\n        acoesHeader.add(btnModoEscuro);\n        acoesHeader.add(btnSair);\n\n        painelHeader.add(pnlTitulos, BorderLayout.WEST);\n        painelHeader.add(acoesHeader, BorderLayout.EAST);\n\n        // Barra de Pesquisa\n        JPanel painelBusca = new JPanel(new BorderLayout());\n        painelBusca.setOpaque(false);\n        painelBusca.setBorder(new EmptyBorder(0, 14, 10, 14));\n\n        campoPesquisa = new JTextField();\n        campoPesquisa.setFont(new Font(\"Segoe UI\", Font.PLAIN, 13));\n        campoPesquisa.setBorder(new CompoundBorder(\n                new LineBorder(modoEscuro ? new Color(51, 65, 85) : new Color(203, 213, 225), 1, true),\n                new EmptyBorder(6, 10, 6, 10)\n        ));\n        campoPesquisa.setBackground(modoEscuro ? new Color(30, 41, 59) : new Color(241, 245, 249));\n        campoPesquisa.setForeground(modoEscuro ? Color.WHITE : new Color(15, 23, 42));\n        campoPesquisa.setCaretColor(COR_AZUL);\n        campoPesquisa.setToolTipText(\"Digite para pesquisar em tempo real...\");\n\n        campoPesquisa.addKeyListener(new KeyAdapter() {\n            @Override\n            public void keyReleased(KeyEvent e) {\n                textoPesquisa = campoPesquisa.getText().trim().toLowerCase();\n                atualizarLista();\n            }\n        });\n\n        JLabel lblLupa = new JLabel(\"🔍 \");\n        lblLupa.setBorder(new EmptyBorder(0, 4, 0, 0));\n        painelBusca.add(lblLupa, BorderLayout.WEST);\n        painelBusca.add(campoPesquisa, BorderLayout.CENTER);\n\n        topoCelular.add(painelHeader, BorderLayout.NORTH);\n        topoCelular.add(painelBusca, BorderLayout.SOUTH);\n\n        // 2. Barra de Categorias (Filtros: Todas, Estudos, Trabalho, Pessoal, Favoritos)\n        JPanel painelCategorias = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 8));\n        painelCategorias.setOpaque(false);\n\n        painelCategorias.add(criarBotaoFiltro(\"Todas\", \"todas\", new Color(15, 23, 42)));\n        painelCategorias.add(criarBotaoFiltro(\"Estudos\", \"estudos\", COR_AZUL));\n        painelCategorias.add(criarBotaoFiltro(\"Trabalho\", \"trabalho\", COR_VERDE));\n        painelCategorias.add(criarBotaoFiltro(\"Pessoal\", \"pessoal\", COR_LILAS));\n        painelCategorias.add(criarBotaoFiltro(\"★ Favoritos\", \"favoritos\", COR_AMARELO_FAV));\n\n        JPanel topoCompleto = new JPanel(new BorderLayout());\n        topoCompleto.setOpaque(false);\n        topoCompleto.add(topoCelular, BorderLayout.NORTH);\n        topoCompleto.add(painelCategorias, BorderLayout.SOUTH);\n\n        painelContainer.add(topoCompleto, BorderLayout.NORTH);\n\n        // 3. Área Central de Rolagem de Anotações (Lista de Cards)\n        painelLista = new JPanel();\n        painelLista.setLayout(new BoxLayout(painelLista, BoxLayout.Y_AXIS));\n        painelLista.setOpaque(false);\n        painelLista.setBorder(new EmptyBorder(6, 12, 80, 12));\n\n        scrollPane = new JScrollPane(painelLista);\n        scrollPane.setBorder(null);\n        scrollPane.setOpaque(false);\n        scrollPane.getViewport().setOpaque(false);\n        scrollPane.getVerticalScrollBar().setUnitIncrement(16);\n\n        // Painel com Sobreposição para o Botão Flutuante (FAB)\n        JLayeredPane layeredPane = new JLayeredPane();\n        layeredPane.setLayout(null);\n\n        // 4. Barra Inferior com Botão Flutuante (+ Nova Anotação)\n        JPanel painelInferior = new JPanel(new BorderLayout());\n        painelInferior.setOpaque(false);\n        painelInferior.setBorder(new EmptyBorder(8, 14, 12, 14));\n\n        JButton btnNovaNota = new JButton(\"＋  Nova Anotação\");\n        btnNovaNota.setFont(new Font(\"Segoe UI\", Font.BOLD, 14));\n        btnNovaNota.setForeground(Color.WHITE);\n        btnNovaNota.setBackground(COR_AZUL);\n        btnNovaNota.setFocusPainted(false);\n        btnNovaNota.setCursor(new Cursor(Cursor.HAND_CURSOR));\n        btnNovaNota.setBorder(new CompoundBorder(\n                new LineBorder(COR_AZUL, 1, true),\n                new EmptyBorder(12, 20, 12, 20)\n        ));\n        btnNovaNota.addActionListener(e -> abrirEditorNota(null));\n\n        painelInferior.add(btnNovaNota, BorderLayout.CENTER);\n\n        painelContainer.add(scrollPane, BorderLayout.CENTER);\n        painelContainer.add(painelInferior, BorderLayout.SOUTH);\n\n        setContentPane(painelContainer);\n    }\n\n    private Color getCorFundo() {\n        return modoEscuro ? new Color(15, 23, 42) : new Color(248, 250, 252);\n    }\n\n    private Color getCorCard() {\n        return modoEscuro ? new Color(30, 41, 59) : Color.WHITE;\n    }\n\n    private Color getCorTexto() {\n        return modoEscuro ? new Color(241, 245, 249) : new Color(15, 23, 42);\n    }\n\n    private JButton criarBotaoRedondo(String texto, Color bg) {\n        JButton btn = new JButton(texto);\n        btn.setFont(new Font(\"Segoe UI\", Font.BOLD, 11));\n        btn.setForeground(Color.WHITE);\n        btn.setBackground(bg);\n        btn.setFocusPainted(false);\n        btn.setBorder(new CompoundBorder(\n                new LineBorder(bg, 1, true),\n                new EmptyBorder(5, 10, 5, 10)\n        ));\n        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));\n        return btn;\n    }\n\n    private JButton criarBotaoFiltro(String label, String id, Color corAtiva) {\n        JButton btn = new JButton(label);\n        boolean ativo = categoriaFiltro.equals(id);\n\n        btn.setFont(new Font(\"Segoe UI\", ativo ? Font.BOLD : Font.PLAIN, 11));\n        btn.setFocusPainted(false);\n        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));\n\n        if (ativo) {\n            btn.setBackground(corAtiva);\n            btn.setForeground(Color.WHITE);\n        } else {\n            btn.setBackground(modoEscuro ? new Color(30, 41, 59) : Color.WHITE);\n            btn.setForeground(modoEscuro ? new Color(203, 213, 225) : new Color(71, 85, 105));\n        }\n\n        btn.setBorder(new CompoundBorder(\n                new LineBorder(ativo ? corAtiva : (modoEscuro ? new Color(51, 65, 85) : new Color(226, 232, 240)), 1, true),\n                new EmptyBorder(4, 8, 4, 8)\n        ));\n\n        btn.addActionListener(e -> {\n            categoriaFiltro = id;\n            atualizarLista();\n            // Reconstruir para atualizar os estados visuais dos botões\n            painelContainer.removeAll();\n            construirInterface();\n            painelContainer.revalidate();\n            painelContainer.repaint();\n            atualizarLista();\n        });\n\n        return btn;\n    }\n\n    // Atualiza a exibição das notas com base na pesquisa e filtro de categoria\n    private void atualizarLista() {\n        painelLista.removeAll();\n\n        List<Nota> filtradas = new ArrayList<>();\n        for (Nota n : todasNotas) {\n            // Filtro por categoria\n            if (categoriaFiltro.equals(\"favoritos\")) {\n                if (!n.isFavorito()) continue;\n            } else if (!categoriaFiltro.equals(\"todas\")) {\n                if (!n.getCategoria().equalsIgnoreCase(categoriaFiltro)) continue;\n            }\n\n            // Filtro por busca\n            if (!textoPesquisa.isEmpty()) {\n                boolean matchTitulo = n.getTitulo().toLowerCase().contains(textoPesquisa);\n                boolean matchConteudo = n.getConteudo().toLowerCase().contains(textoPesquisa);\n                if (!matchTitulo && !matchConteudo) continue;\n            }\n\n            filtradas.add(n);\n        }\n\n        // Ordenar: Fixadas primeiro, depois por data decrescente\n        filtradas.sort((a, b) -> {\n            if (a.isFixado() && !b.isFixado()) return -1;\n            if (!a.isFixado() && b.isFixado()) return 1;\n            return Long.compare(b.getAtualizadoEm(), a.getAtualizadoEm());\n        });\n\n        if (filtradas.isEmpty()) {\n            JPanel emptyPanel = new JPanel(new GridLayout(3, 1));\n            emptyPanel.setOpaque(false);\n            emptyPanel.setBorder(new EmptyBorder(40, 20, 20, 20));\n\n            JLabel lblVazioIcon = new JLabel(\"📝\", SwingConstants.CENTER);\n            lblVazioIcon.setFont(new Font(\"Segoe UI\", Font.PLAIN, 40));\n\n            JLabel lblVazioTxt = new JLabel(\"Nenhuma anotação encontrada\", SwingConstants.CENTER);\n            lblVazioTxt.setFont(new Font(\"Segoe UI\", Font.BOLD, 14));\n            lblVazioTxt.setForeground(getCorTexto());\n\n            JLabel lblVazioSub = new JLabel(\"Toque em 'Nova Anotação' abaixo para começar.\", SwingConstants.CENTER);\n            lblVazioSub.setFont(new Font(\"Segoe UI\", Font.PLAIN, 12));\n            lblVazioSub.setForeground(Color.GRAY);\n\n            emptyPanel.add(lblVazioIcon);\n            emptyPanel.add(lblVazioTxt);\n            emptyPanel.add(lblVazioSub);\n\n            painelLista.add(emptyPanel);\n        } else {\n            for (Nota n : filtradas) {\n                painelLista.add(criarCardNota(n));\n                painelLista.add(Box.createRigidArea(new Dimension(0, 10)));\n            }\n        }\n\n        painelLista.revalidate();\n        painelLista.repaint();\n    }\n\n    // Cria o Card moderno da anotação com cantos suaves e botões de ação\n    private JPanel criarCardNota(Nota nota) {\n        JPanel card = new JPanel(new BorderLayout(8, 8));\n        card.setBackground(getCorCard());\n        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));\n\n        Color bordaColor = modoEscuro ? new Color(51, 65, 85) : new Color(226, 232, 240);\n        if (nota.isFixado()) {\n            bordaColor = COR_AZUL;\n        }\n\n        card.setBorder(new CompoundBorder(\n                new LineBorder(bordaColor, nota.isFixado() ? 2 : 1, true),\n                new EmptyBorder(12, 14, 12, 14)\n        ));\n\n        // Topo do card: Tag de Categoria e Favorito\n        JPanel cardHeader = new JPanel(new BorderLayout());\n        cardHeader.setOpaque(false);\n\n        Color corTagBg, corTagTexto;\n        String nomeTag;\n        if (nota.getCategoria().equalsIgnoreCase(\"trabalho\")) {\n            corTagBg = COR_VERDE_CLARO;\n            corTagTexto = COR_VERDE;\n            nomeTag = \"TRABALHO\";\n        } else if (nota.getCategoria().equalsIgnoreCase(\"pessoal\")) {\n            corTagBg = COR_LILAS_CLARO;\n            corTagTexto = COR_LILAS;\n            nomeTag = \"PESSOAL\";\n        } else {\n            corTagBg = COR_AZUL_CLARO;\n            corTagTexto = COR_AZUL;\n            nomeTag = \"ESTUDOS\";\n        }\n\n        JLabel lblTag = new JLabel(\" \" + nomeTag + \" \");\n        lblTag.setOpaque(true);\n        lblTag.setBackground(corTagBg);\n        lblTag.setForeground(corTagTexto);\n        lblTag.setFont(new Font(\"Segoe UI\", Font.BOLD, 10));\n        lblTag.setBorder(new EmptyBorder(2, 6, 2, 6));\n\n        JButton btnFav = new JButton(nota.isFavorito() ? \"★\" : \"☆\");\n        btnFav.setFont(new Font(\"Segoe UI\", Font.BOLD, 14));\n        btnFav.setForeground(nota.isFavorito() ? COR_AMARELO_FAV : Color.GRAY);\n        btnFav.setBorder(null);\n        btnFav.setContentAreaFilled(false);\n        btnFav.setCursor(new Cursor(Cursor.HAND_CURSOR));\n        btnFav.addActionListener(e -> {\n            nota.setFavorito(!nota.isFavorito());\n            BancoNotas.salvar(todasNotas);\n            atualizarLista();\n        });\n\n        cardHeader.add(lblTag, BorderLayout.WEST);\n        cardHeader.add(btnFav, BorderLayout.EAST);\n\n        // Corpo do card: Título e Prévia\n        JPanel cardBody = new JPanel(new GridLayout(2, 1, 2, 2));\n        cardBody.setOpaque(false);\n\n        JLabel lblTitulo = new JLabel(nota.getTitulo());\n        lblTitulo.setFont(new Font(\"Segoe UI\", Font.BOLD, 14));\n        lblTitulo.setForeground(getCorTexto());\n\n        String preview = nota.getConteudo().replace(\"\\n\", \" \");\n        if (preview.length() > 65) preview = preview.substring(0, 65) + \"...\";\n        JLabel lblPreview = new JLabel(preview.isEmpty() ? \"(Sem conteúdo)\" : preview);\n        lblPreview.setFont(new Font(\"Segoe UI\", Font.PLAIN, 12));\n        lblPreview.setForeground(modoEscuro ? new Color(148, 163, 184) : new Color(100, 116, 139));\n\n        cardBody.add(lblTitulo);\n        cardBody.add(lblPreview);\n\n        // Rodapé do card: Data e Botões (Visualizar, Editar, Excluir)\n        JPanel cardFooter = new JPanel(new BorderLayout());\n        cardFooter.setOpaque(false);\n\n        JLabel lblData = new JLabel(nota.getDataFormatada());\n        lblData.setFont(new Font(\"Segoe UI\", Font.PLAIN, 10));\n        lblData.setForeground(Color.GRAY);\n\n        JPanel btnActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));\n        btnActions.setOpaque(false);\n\n        JButton btnVer = new JButton(\"Ver\");\n        estilizarBotaoAcao(btnVer, COR_AZUL);\n        btnVer.addActionListener(e -> abrirVisualizadorNota(nota));\n\n        JButton btnEditar = new JButton(\"Editar\");\n        estilizarBotaoAcao(btnEditar, COR_VERDE);\n        btnEditar.addActionListener(e -> abrirEditorNota(nota));\n\n        JButton btnExcluir = new JButton(\"Excluir\");\n        estilizarBotaoAcao(btnExcluir, new Color(225, 29, 72));\n        btnExcluir.addActionListener(e -> confirmarExclusaoNota(nota));\n\n        btnActions.add(btnVer);\n        btnActions.add(btnEditar);\n        btnActions.add(btnExcluir);\n\n        cardFooter.add(lblData, BorderLayout.WEST);\n        cardFooter.add(btnActions, BorderLayout.EAST);\n\n        card.add(cardHeader, BorderLayout.NORTH);\n        card.add(cardBody, BorderLayout.CENTER);\n        card.add(cardFooter, BorderLayout.SOUTH);\n\n        // Clique no card abre visualizador\n        card.setCursor(new Cursor(Cursor.HAND_CURSOR));\n        card.addMouseListener(new MouseAdapter() {\n            @Override\n            public void mouseClicked(MouseEvent e) {\n                if (e.getSource() == card) {\n                    abrirVisualizadorNota(nota);\n                }\n            }\n        });\n\n        return card;\n    }\n\n    private void estilizarBotaoAcao(JButton btn, Color cor) {\n        btn.setFont(new Font(\"Segoe UI\", Font.BOLD, 10));\n        btn.setForeground(cor);\n        btn.setBackground(modoEscuro ? new Color(15, 23, 42) : Color.WHITE);\n        btn.setFocusPainted(false);\n        btn.setBorder(new CompoundBorder(\n                new LineBorder(cor, 1, true),\n                new EmptyBorder(3, 8, 3, 8)\n        ));\n        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));\n    }\n\n    // Modal de Criação / Edição de Anotação\n    private void abrirEditorNota(Nota notaExistente) {\n        JDialog dialog = new JDialog(this, notaExistente == null ? \"Nova Anotação\" : \"Editar Anotação\", true);\n        dialog.setSize(380, 520);\n        dialog.setLocationRelativeTo(this);\n\n        JPanel panel = new JPanel(new BorderLayout(10, 10));\n        panel.setBackground(getCorFundo());\n        panel.setBorder(new EmptyBorder(16, 16, 16, 16));\n\n        // Título\n        JTextField txtTitulo = new JTextField(notaExistente != null ? notaExistente.getTitulo() : \"\");\n        txtTitulo.setFont(new Font(\"Segoe UI\", Font.BOLD, 14));\n        txtTitulo.setBorder(new CompoundBorder(new LineBorder(Color.LIGHT_GRAY, 1, true), new EmptyBorder(6, 8, 6, 8)));\n\n        // Categoria\n        JComboBox<String> cbCategoria = new JComboBox<>(new String[]{\"Estudos\", \"Trabalho\", \"Pessoal\"});\n        cbCategoria.setFont(new Font(\"Segoe UI\", Font.PLAIN, 12));\n        if (notaExistente != null) {\n            if (notaExistente.getCategoria().equalsIgnoreCase(\"trabalho\")) cbCategoria.setSelectedIndex(1);\n            else if (notaExistente.getCategoria().equalsIgnoreCase(\"pessoal\")) cbCategoria.setSelectedIndex(2);\n            else cbCategoria.setSelectedIndex(0);\n        }\n\n        // Conteúdo\n        JTextArea txtConteudo = new JTextArea(notaExistente != null ? notaExistente.getConteudo() : \"\");\n        txtConteudo.setFont(new Font(\"Segoe UI\", Font.PLAIN, 13));\n        txtConteudo.setLineWrap(true);\n        txtConteudo.setWrapStyleWord(true);\n        JScrollPane scrollConteudo = new JScrollPane(txtConteudo);\n        scrollConteudo.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));\n\n        // Checkbox Favorito e Fixado\n        JCheckBox chkFav = new JCheckBox(\"Marcar como Favorito\", notaExistente != null && notaExistente.isFavorito());\n        chkFav.setOpaque(false);\n        chkFav.setForeground(getCorTexto());\n\n        JCheckBox chkFix = new JCheckBox(\"Fixar no topo\", notaExistente != null && notaExistente.isFixado());\n        chkFix.setOpaque(false);\n        chkFix.setForeground(getCorTexto());\n\n        JPanel pnlChecks = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));\n        pnlChecks.setOpaque(false);\n        pnlChecks.add(chkFav);\n        pnlChecks.add(chkFix);\n\n        JPanel topoEditor = new JPanel(new GridLayout(4, 1, 4, 4));\n        topoEditor.setOpaque(false);\n        JLabel lblRotuloTit = new JLabel(\"Título da Anotação:\");\n        lblRotuloTit.setForeground(getCorTexto());\n        topoEditor.add(lblRotuloTit);\n        topoEditor.add(txtTitulo);\n\n        JLabel lblRotuloCat = new JLabel(\"Categoria:\");\n        lblRotuloCat.setForeground(getCorTexto());\n        topoEditor.add(lblRotuloCat);\n        topoEditor.add(cbCategoria);\n\n        panel.add(topoEditor, BorderLayout.NORTH);\n\n        JPanel pnlMeio = new JPanel(new BorderLayout(4, 4));\n        pnlMeio.setOpaque(false);\n        JLabel lblRotuloCont = new JLabel(\"Conteúdo:\");\n        lblRotuloCont.setForeground(getCorTexto());\n        pnlMeio.add(lblRotuloCont, BorderLayout.NORTH);\n        pnlMeio.add(scrollConteudo, BorderLayout.CENTER);\n        pnlMeio.add(pnlChecks, BorderLayout.SOUTH);\n\n        panel.add(pnlMeio, BorderLayout.CENTER);\n\n        // Botões Salvar e Cancelar\n        JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));\n        pnlBotoes.setOpaque(false);\n\n        JButton btnCancelar = new JButton(\"Cancelar\");\n        btnCancelar.addActionListener(e -> dialog.dispose());\n\n        JButton btnSalvar = new JButton(\"💾 Salvar\");\n        btnSalvar.setFont(new Font(\"Segoe UI\", Font.BOLD, 12));\n        btnSalvar.setBackground(COR_AZUL);\n        btnSalvar.setForeground(Color.WHITE);\n        btnSalvar.setFocusPainted(false);\n\n        btnSalvar.addActionListener(e -> {\n            String tit = txtTitulo.getText().trim();\n            String cont = txtConteudo.getText().trim();\n            if (tit.isEmpty()) {\n                JOptionPane.showMessageDialog(dialog, \"Por favor, digite um título para a anotação.\", \"Aviso\", JOptionPane.WARNING_MESSAGE);\n                return;\n            }\n\n            String cat = \"estudos\";\n            int idx = cbCategoria.getSelectedIndex();\n            if (idx == 1) cat = \"trabalho\";\n            else if (idx == 2) cat = \"pessoal\";\n\n            if (notaExistente != null) {\n                notaExistente.setTitulo(tit);\n                notaExistente.setConteudo(cont);\n                notaExistente.setCategoria(cat);\n                notaExistente.setFavorito(chkFav.isSelected());\n                notaExistente.setFixado(chkFix.isSelected());\n            } else {\n                Nota nova = new Nota(tit, cont, cat);\n                nova.setFavorito(chkFav.isSelected());\n                nova.setFixado(chkFix.isSelected());\n                todasNotas.add(0, nova);\n            }\n\n            BancoNotas.salvar(todasNotas);\n            atualizarLista();\n            dialog.dispose();\n            JOptionPane.showMessageDialog(this, \"Anotação salva com sucesso!\", \"Sucesso\", JOptionPane.INFORMATION_MESSAGE);\n        });\n\n        pnlBotoes.add(btnCancelar);\n        pnlBotoes.add(btnSalvar);\n        panel.add(pnlBotoes, BorderLayout.SOUTH);\n\n        dialog.setContentPane(panel);\n        dialog.setVisible(true);\n    }\n\n    // Modal de Leitura / Visualização Completa da Anotação\n    private void abrirVisualizadorNota(Nota nota) {\n        JDialog dialog = new JDialog(this, \"Visualizar Anotação\", true);\n        dialog.setSize(380, 480);\n        dialog.setLocationRelativeTo(this);\n\n        JPanel panel = new JPanel(new BorderLayout(10, 10));\n        panel.setBackground(getCorFundo());\n        panel.setBorder(new EmptyBorder(16, 16, 16, 16));\n\n        // Cabeçalho da nota\n        JPanel pnlCabecalho = new JPanel(new GridLayout(3, 1, 2, 2));\n        pnlCabecalho.setOpaque(false);\n\n        JLabel lblTit = new JLabel(nota.getTitulo());\n        lblTit.setFont(new Font(\"Segoe UI\", Font.BOLD, 16));\n        lblTit.setForeground(getCorTexto());\n\n        JLabel lblCat = new JLabel(\"Categoria: \" + nota.getCategoria().toUpperCase() + \" • \" + nota.getDataFormatada());\n        lblCat.setFont(new Font(\"Segoe UI\", Font.PLAIN, 11));\n        lblCat.setForeground(Color.GRAY);\n\n        pnlCabecalho.add(lblTit);\n        pnlCabecalho.add(lblCat);\n\n        JTextArea txtLeitura = new JTextArea(nota.getConteudo());\n        txtLeitura.setFont(new Font(\"Segoe UI\", Font.PLAIN, 13));\n        txtLeitura.setEditable(false);\n        txtLeitura.setLineWrap(true);\n        txtLeitura.setWrapStyleWord(true);\n        txtLeitura.setBackground(getCorCard());\n        txtLeitura.setForeground(getCorTexto());\n        JScrollPane scroll = new JScrollPane(txtLeitura);\n        scroll.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));\n\n        // Botões de Voltar, Editar e Excluir\n        JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));\n        pnlBotoes.setOpaque(false);\n\n        JButton btnVoltar = new JButton(\"Voltar\");\n        btnVoltar.addActionListener(e -> dialog.dispose());\n\n        JButton btnEdit = new JButton(\"Editar\");\n        btnEdit.setBackground(COR_VERDE);\n        btnEdit.setForeground(Color.WHITE);\n        btnEdit.addActionListener(e -> {\n            dialog.dispose();\n            abrirEditorNota(nota);\n        });\n\n        JButton btnDel = new JButton(\"Excluir\");\n        btnDel.setBackground(new Color(225, 29, 72));\n        btnDel.setForeground(Color.WHITE);\n        btnDel.addActionListener(e -> {\n            dialog.dispose();\n            confirmarExclusaoNota(nota);\n        });\n\n        pnlBotoes.add(btnVoltar);\n        pnlBotoes.add(btnEdit);\n        pnlBotoes.add(btnDel);\n\n        panel.add(pnlCabecalho, BorderLayout.NORTH);\n        panel.add(scroll, BorderLayout.CENTER);\n        panel.add(pnlBotoes, BorderLayout.SOUTH);\n\n        dialog.setContentPane(panel);\n        dialog.setVisible(true);\n    }\n\n    // Confirmação de Exclusão\n    private void confirmarExclusaoNota(Nota nota) {\n        int resp = JOptionPane.showConfirmDialog(\n                this,\n                \"Deseja realmente excluir a anotação:\\n\\\"\" + nota.getTitulo() + \"\\\"?\",\n                \"Confirmar Exclusão\",\n                JOptionPane.YES_NO_OPTION,\n                JOptionPane.WARNING_MESSAGE\n        );\n\n        if (resp == JOptionPane.YES_OPTION) {\n            todasNotas.remove(nota);\n            BancoNotas.salvar(todasNotas);\n            atualizarLista();\n            JOptionPane.showMessageDialog(this, \"Anotação excluída com sucesso.\", \"Excluída\", JOptionPane.INFORMATION_MESSAGE);\n        }\n    }\n\n    // Confirmação de Saída\n    private void confirmarSaida() {\n        int resp = JOptionPane.showConfirmDialog(\n                this,\n                \"Deseja realmente sair do aplicativo?\\nSuas anotações estão todas salvas com segurança no arquivo local.\",\n                \"Confirmar Saída\",\n                JOptionPane.YES_NO_OPTION,\n                JOptionPane.QUESTION_MESSAGE\n        );\n\n        if (resp == JOptionPane.YES_OPTION) {\n            System.exit(0);\n        }\n    }\n\n    // Alternar Tema Claro / Escuro\n    private void alternarModoEscuro() {\n        modoEscuro = !modoEscuro;\n        btnModoEscuro.setText(modoEscuro ? \"☀️ Claro\" : \"🌙 Escuro\");\n        painelContainer.setBackground(getCorFundo());\n        atualizarLista();\n        repaint();\n    }\n\n    // Método Principal de Execução em Java\n    public static void main(String[] args) {\n        // Look & Feel do Sistema\n        try {\n            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());\n        } catch (Exception ignored) {}\n\n        SwingUtilities.invokeLater(() -> {\n            BlocoDeNotasApp app = new BlocoDeNotasApp();\n            app.setVisible(true);\n        });\n    }\n}\n"
   },
   {
-    name: 'NoteDatabaseHelper.java',
-    path: 'app/src/main/java/com/blocodenotas/app/database/NoteDatabaseHelper.java',
-    language: 'java',
-    description: 'Banco de dados SQLite local para persistência offline das anotações',
-    content: `package com.blocodenotas.app.database;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import com.blocodenotas.app.model.Note;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class NoteDatabaseHelper extends SQLiteOpenHelper {
-
-    private static final String DATABASE_NAME = "bloco_de_notas.db";
-    private static final int DATABASE_VERSION = 1;
-
-    public static final String TABLE_NOTES = "notes";
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_CONTENT = "content";
-    public static final String COLUMN_CATEGORY = "category";
-    public static final String COLUMN_IS_FAVORITE = "is_favorite";
-    public static final String COLUMN_IS_PINNED = "is_pinned";
-    public static final String COLUMN_CREATED_AT = "created_at";
-    public static final String COLUMN_UPDATED_AT = "updated_at";
-
-    private static final String TABLE_CREATE =
-            "CREATE TABLE " + TABLE_NOTES + " (" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_TITLE + " TEXT NOT NULL, " +
-                    COLUMN_CONTENT + " TEXT, " +
-                    COLUMN_CATEGORY + " TEXT DEFAULT 'estudos', " +
-                    COLUMN_IS_FAVORITE + " INTEGER DEFAULT 0, " +
-                    COLUMN_IS_PINNED + " INTEGER DEFAULT 0, " +
-                    COLUMN_CREATED_AT + " INTEGER, " +
-                    COLUMN_UPDATED_AT + " INTEGER);";
-
-    public NoteDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
-        onCreate(db);
-    }
-
-    // Inserir Nova Anotação (Salvar)
-    public long insertNote(Note note) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_TITLE, note.getTitle());
-        values.put(COLUMN_CONTENT, note.getContent());
-        values.put(COLUMN_CATEGORY, note.getCategory());
-        values.put(COLUMN_IS_FAVORITE, note.isFavorite() ? 1 : 0);
-        values.put(COLUMN_IS_PINNED, note.isPinned() ? 1 : 0);
-        values.put(COLUMN_CREATED_AT, note.getCreatedAt());
-        values.put(COLUMN_UPDATED_AT, note.getUpdatedAt());
-
-        long id = db.insert(TABLE_NOTES, null, values);
-        note.setId(id);
-        db.close();
-        return id;
-    }
-
-    // Atualizar Anotação Existente (Editar)
-    public int updateNote(Note note) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_TITLE, note.getTitle());
-        values.put(COLUMN_CONTENT, note.getContent());
-        values.put(COLUMN_CATEGORY, note.getCategory());
-        values.put(COLUMN_IS_FAVORITE, note.isFavorite() ? 1 : 0);
-        values.put(COLUMN_IS_PINNED, note.isPinned() ? 1 : 0);
-        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());
-
-        int rows = db.update(TABLE_NOTES, values, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(note.getId())});
-        db.close();
-        return rows;
-    }
-
-    // Excluir Anotação
-    public void deleteNote(long id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NOTES, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
-        db.close();
-    }
-
-    // Alternar Favorito
-    public void toggleFavorite(long id, boolean isFavorite) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_IS_FAVORITE, isFavorite ? 1 : 0);
-        db.update(TABLE_NOTES, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
-        db.close();
-    }
-
-    // Buscar todas ou com filtros
-    public List<Note> getNotes(String categoryFilter, boolean onlyFavorites, String searchQuery) {
-        List<Note> list = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        StringBuilder query = new StringBuilder("SELECT * FROM " + TABLE_NOTES + " WHERE 1=1");
-        List<String> args = new ArrayList<>();
-
-        if (onlyFavorites) {
-            query.append(" AND ").append(COLUMN_IS_FAVORITE).append(" = 1");
-        } else if (categoryFilter != null && !categoryFilter.equals("todas")) {
-            query.append(" AND ").append(COLUMN_CATEGORY).append(" = ?");
-            args.add(categoryFilter);
-        }
-
-        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            query.append(" AND (").append(COLUMN_TITLE).append(" LIKE ? OR ")
-                 .append(COLUMN_CONTENT).append(" LIKE ?)");
-            args.add("%" + searchQuery + "%");
-            args.add("%" + searchQuery + "%");
-        }
-
-        query.append(" ORDER BY ").append(COLUMN_IS_PINNED).append(" DESC, ")
-             .append(COLUMN_UPDATED_AT).append(" DESC");
-
-        Cursor cursor = db.rawQuery(query.toString(), args.toArray(new String[0]));
-
-        if (cursor.moveToFirst()) {
-            do {
-                Note note = new Note();
-                note.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));
-                note.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)));
-                note.setContent(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)));
-                note.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY)));
-                note.setFavorite(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_FAVORITE)) == 1);
-                note.setPinned(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_PINNED)) == 1);
-                note.setCreatedAt(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_CREATED_AT)));
-                note.setUpdatedAt(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_UPDATED_AT)));
-                list.add(note);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-        return list;
-    }
-}
-`,
+    "name": "Note.java",
+    "path": "app/src/main/java/com/blocodenotas/app/model/Note.java",
+    "language": "java",
+    "category": "android",
+    "description": "Classe de modelo que representa uma anotação com categoria, favoritos e data",
+    "content": "package com.blocodenotas.app.model;\n\nimport java.io.Serializable;\nimport java.text.SimpleDateFormat;\nimport java.util.Date;\nimport java.util.Locale;\n\npublic class Note implements Serializable {\n    private long id;\n    private String title;\n    private String content;\n    private String category; // \"estudos\", \"trabalho\", \"pessoal\"\n    private boolean isFavorite;\n    private boolean isPinned;\n    private boolean isLocked;\n    private long createdAt;\n    private long updatedAt;\n\n    public Note() {\n        this.createdAt = System.currentTimeMillis();\n        this.updatedAt = System.currentTimeMillis();\n        this.category = \"estudos\";\n        this.isFavorite = false;\n        this.isPinned = false;\n        this.isLocked = false;\n    }\n\n    public Note(String title, String content, String category) {\n        this();\n        this.title = title;\n        this.content = content;\n        this.category = category;\n    }\n\n    // Getters and Setters\n    public long getId() { return id; }\n    public void setId(long id) { this.id = id; }\n\n    public String getTitle() { return title; }\n    public void setTitle(String title) { \n        this.title = title; \n        this.updatedAt = System.currentTimeMillis();\n    }\n\n    public String getContent() { return content; }\n    public void setContent(String content) { \n        this.content = content; \n        this.updatedAt = System.currentTimeMillis();\n    }\n\n    public String getCategory() { return category; }\n    public void setCategory(String category) { this.category = category; }\n\n    public boolean isFavorite() { return isFavorite; }\n    public void setFavorite(boolean favorite) { isFavorite = favorite; }\n\n    public boolean isPinned() { return isPinned; }\n    public void setPinned(boolean pinned) { isPinned = pinned; }\n\n    public long getCreatedAt() { return createdAt; }\n    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }\n\n    public long getUpdatedAt() { return updatedAt; }\n    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }\n\n    public String getFormattedDate() {\n        SimpleDateFormat sdf = new SimpleDateFormat(\"dd/MM/yyyy HH:mm\", Locale.getDefault());\n        return sdf.format(new Date(this.updatedAt));\n    }\n}\n"
   },
   {
-    name: 'MainActivity.java',
-    path: 'app/src/main/java/com/blocodenotas/app/MainActivity.java',
-    language: 'java',
-    description: 'Tela principal do aplicativo Android com lista de notas, pesquisa e categorias',
-    content: `package com.blocodenotas.app;
-
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
-import android.widget.EditText;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.blocodenotas.app.adapter.NoteAdapter;
-import com.blocodenotas.app.database.NoteDatabaseHelper;
-import com.blocodenotas.app.model.Note;
-
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements NoteAdapter.OnNoteClickListener {
-
-    private RecyclerView recyclerView;
-    private NoteAdapter adapter;
-    private NoteDatabaseHelper dbHelper;
-    private EditText etSearch;
-    private BottomNavigationView bottomNav;
-    private FloatingActionButton fabNewNote;
-
-    private String currentCategory = "todas";
-    private boolean isFavoritesOnly = false;
-    private String currentSearchText = "";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        dbHelper = new NoteDatabaseHelper(this);
-
-        initViews();
-        setupRecyclerView();
-        setupListeners();
-        loadNotes();
-    }
-
-    private void initViews() {
-        recyclerView = findViewById(R.id.recyclerViewNotes);
-        etSearch = findViewById(R.id.etSearch);
-        bottomNav = findViewById(R.id.bottomNavigation);
-        fabNewNote = findViewById(R.id.fabNewNote);
-    }
-
-    private void setupRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NoteAdapter(this, this);
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void setupListeners() {
-        // Nova Anotação
-        fabNewNote.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, NoteEditorActivity.class);
-            startActivity(intent);
-        });
-
-        // Pesquisar em tempo real
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                currentSearchText = s.toString();
-                loadNotes();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        // Categorias via Bottom Navigation (Estudos, Trabalho, Pessoal, Favoritos)
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_all) {
-                currentCategory = "todas";
-                isFavoritesOnly = false;
-            } else if (id == R.id.nav_estudos) {
-                currentCategory = "estudos";
-                isFavoritesOnly = false;
-            } else if (id == R.id.nav_trabalho) {
-                currentCategory = "trabalho";
-                isFavoritesOnly = false;
-            } else if (id == R.id.nav_pessoal) {
-                currentCategory = "pessoal";
-                isFavoritesOnly = false;
-            } else if (id == R.id.nav_favorites) {
-                currentCategory = "todas";
-                isFavoritesOnly = true;
-            }
-            loadNotes();
-            return true;
-        });
-
-        // Botão Sair com Diálogo de Confirmação
-        findViewById(R.id.btnExit).setOnClickListener(v -> showExitConfirmationDialog());
-
-        // Botão Modo Escuro
-        findViewById(R.id.btnToggleTheme).setOnClickListener(v -> toggleDarkMode());
-    }
-
-    private void loadNotes() {
-        List<Note> notes = dbHelper.getNotes(currentCategory, isFavoritesOnly, currentSearchText);
-        adapter.setNotes(notes);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadNotes();
-    }
-
-    @Override
-    public void onNoteClick(Note note) {
-        // Visualizar Anotação Completa
-        Intent intent = new Intent(this, NoteViewerActivity.class);
-        intent.putExtra("note_id", note.getId());
-        startActivity(intent);
-    }
-
-    @Override
-    public void onNoteEdit(Note note) {
-        // Editar Anotação
-        Intent intent = new Intent(this, NoteEditorActivity.class);
-        intent.putExtra("note_id", note.getId());
-        startActivity(intent);
-    }
-
-    @Override
-    public void onNoteDelete(Note note) {
-        // Excluir com Diálogo de Confirmação
-        new AlertDialog.Builder(this)
-                .setTitle("Excluir Anotação")
-                .setMessage("Tem certeza de que deseja excluir \\"" + note.getTitle() + "\\" ?")
-                .setPositiveButton("Excluir", (dialog, which) -> {
-                    dbHelper.deleteNote(note.getId());
-                    loadNotes();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
-    @Override
-    public void onNoteFavoriteToggle(Note note) {
-        boolean nextState = !note.isFavorite();
-        dbHelper.toggleFavorite(note.getId(), nextState);
-        loadNotes();
-    }
-
-    private void showExitConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Sair do Bloco de Notas")
-                .setMessage("Deseja realmente sair? Suas anotações estão todas gravadas com segurança no dispositivo.")
-                .setPositiveButton("Sair", (dialog, which) -> finish())
-                .setNegativeButton("Continuar no App", null)
-                .show();
-    }
-
-    private void toggleDarkMode() {
-        int currentMode = AppCompatDelegate.getDefaultNightMode();
-        if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-    }
-}
-`,
+    "name": "NoteDatabaseHelper.java",
+    "path": "app/src/main/java/com/blocodenotas/app/database/NoteDatabaseHelper.java",
+    "language": "java",
+    "category": "android",
+    "description": "Banco de dados SQLite local para persistência offline das anotações no celular",
+    "content": "package com.blocodenotas.app.database;\n\nimport android.content.ContentValues;\nimport android.content.Context;\nimport android.database.Cursor;\nimport android.database.sqlite.SQLiteDatabase;\nimport android.database.sqlite.SQLiteOpenHelper;\nimport com.blocodenotas.app.model.Note;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class NoteDatabaseHelper extends SQLiteOpenHelper {\n\n    private static final String DATABASE_NAME = \"bloco_de_notas.db\";\n    private static final int DATABASE_VERSION = 1;\n\n    public static final String TABLE_NOTES = \"notes\";\n    public static final String COLUMN_ID = \"_id\";\n    public static final String COLUMN_TITLE = \"title\";\n    public static final String COLUMN_CONTENT = \"content\";\n    public static final String COLUMN_CATEGORY = \"category\";\n    public static final String COLUMN_IS_FAVORITE = \"is_favorite\";\n    public static final String COLUMN_IS_PINNED = \"is_pinned\";\n    public static final String COLUMN_CREATED_AT = \"created_at\";\n    public static final String COLUMN_UPDATED_AT = \"updated_at\";\n\n    private static final String TABLE_CREATE =\n            \"CREATE TABLE \" + TABLE_NOTES + \" (\" +\n                    COLUMN_ID + \" INTEGER PRIMARY KEY AUTOINCREMENT, \" +\n                    COLUMN_TITLE + \" TEXT NOT NULL, \" +\n                    COLUMN_CONTENT + \" TEXT, \" +\n                    COLUMN_CATEGORY + \" TEXT DEFAULT 'estudos', \" +\n                    COLUMN_IS_FAVORITE + \" INTEGER DEFAULT 0, \" +\n                    COLUMN_IS_PINNED + \" INTEGER DEFAULT 0, \" +\n                    COLUMN_CREATED_AT + \" INTEGER, \" +\n                    COLUMN_UPDATED_AT + \" INTEGER);\";\n\n    public NoteDatabaseHelper(Context context) {\n        super(context, DATABASE_NAME, null, DATABASE_VERSION);\n    }\n\n    @Override\n    public void onCreate(SQLiteDatabase db) {\n        db.execSQL(TABLE_CREATE);\n    }\n\n    @Override\n    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {\n        db.execSQL(\"DROP TABLE IF EXISTS \" + TABLE_NOTES);\n        onCreate(db);\n    }\n\n    // Inserir Nova Anotação (Salvar)\n    public long insertNote(Note note) {\n        SQLiteDatabase db = this.getWritableDatabase();\n        ContentValues values = new ContentValues();\n        values.put(COLUMN_TITLE, note.getTitle());\n        values.put(COLUMN_CONTENT, note.getContent());\n        values.put(COLUMN_CATEGORY, note.getCategory());\n        values.put(COLUMN_IS_FAVORITE, note.isFavorite() ? 1 : 0);\n        values.put(COLUMN_IS_PINNED, note.isPinned() ? 1 : 0);\n        values.put(COLUMN_CREATED_AT, note.getCreatedAt());\n        values.put(COLUMN_UPDATED_AT, note.getUpdatedAt());\n\n        long id = db.insert(TABLE_NOTES, null, values);\n        note.setId(id);\n        db.close();\n        return id;\n    }\n\n    // Atualizar Anotação Existente (Editar)\n    public int updateNote(Note note) {\n        SQLiteDatabase db = this.getWritableDatabase();\n        ContentValues values = new ContentValues();\n        values.put(COLUMN_TITLE, note.getTitle());\n        values.put(COLUMN_CONTENT, note.getContent());\n        values.put(COLUMN_CATEGORY, note.getCategory());\n        values.put(COLUMN_IS_FAVORITE, note.isFavorite() ? 1 : 0);\n        values.put(COLUMN_IS_PINNED, note.isPinned() ? 1 : 0);\n        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());\n\n        int rows = db.update(TABLE_NOTES, values, COLUMN_ID + \" = ?\",\n                new String[]{String.valueOf(note.getId())});\n        db.close();\n        return rows;\n    }\n\n    // Excluir Anotação\n    public void deleteNote(long id) {\n        SQLiteDatabase db = this.getWritableDatabase();\n        db.delete(TABLE_NOTES, COLUMN_ID + \" = ?\", new String[]{String.valueOf(id)});\n        db.close();\n    }\n\n    // Alternar Favorito\n    public void toggleFavorite(long id, boolean isFavorite) {\n        SQLiteDatabase db = this.getWritableDatabase();\n        ContentValues values = new ContentValues();\n        values.put(COLUMN_IS_FAVORITE, isFavorite ? 1 : 0);\n        db.update(TABLE_NOTES, values, COLUMN_ID + \" = ?\", new String[]{String.valueOf(id)});\n        db.close();\n    }\n\n    // Buscar todas ou com filtros\n    public List<Note> getNotes(String categoryFilter, boolean onlyFavorites, String searchQuery) {\n        List<Note> list = new ArrayList<>();\n        SQLiteDatabase db = this.getReadableDatabase();\n\n        StringBuilder query = new StringBuilder(\"SELECT * FROM \" + TABLE_NOTES + \" WHERE 1=1\");\n        List<String> args = new ArrayList<>();\n\n        if (onlyFavorites) {\n            query.append(\" AND \").append(COLUMN_IS_FAVORITE).append(\" = 1\");\n        } else if (categoryFilter != null && !categoryFilter.equals(\"todas\")) {\n            query.append(\" AND \").append(COLUMN_CATEGORY).append(\" = ?\");\n            args.add(categoryFilter);\n        }\n\n        if (searchQuery != null && !searchQuery.trim().isEmpty()) {\n            query.append(\" AND (\").append(COLUMN_TITLE).append(\" LIKE ? OR \")\n                 .append(COLUMN_CONTENT).append(\" LIKE ?)\");\n            args.add(\"%\" + searchQuery + \"%\");\n            args.add(\"%\" + searchQuery + \"%\");\n        }\n\n        query.append(\" ORDER BY \").append(COLUMN_IS_PINNED).append(\" DESC, \")\n             .append(COLUMN_UPDATED_AT).append(\" DESC\");\n\n        Cursor cursor = db.rawQuery(query.toString(), args.toArray(new String[0]));\n\n        if (cursor.moveToFirst()) {\n            do {\n                Note note = new Note();\n                note.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)));\n                note.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE)));\n                note.setContent(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT)));\n                note.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY)));\n                note.setFavorite(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_FAVORITE)) == 1);\n                note.setPinned(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_PINNED)) == 1);\n                note.setCreatedAt(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_CREATED_AT)));\n                note.setUpdatedAt(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_UPDATED_AT)));\n                list.add(note);\n            } while (cursor.moveToNext());\n        }\n\n        cursor.close();\n        db.close();\n        return list;\n    }\n}\n"
   },
   {
-    name: 'NoteEditorActivity.java',
-    path: 'app/src/main/java/com/blocodenotas/app/NoteEditorActivity.java',
-    language: 'java',
-    description: 'Tela de criação e edição de anotações com botão salvar, voltar e seleção de categoria',
-    content: `package com.blocodenotas.app;
-
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import com.blocodenotas.app.database.NoteDatabaseHelper;
-import com.blocodenotas.app.model.Note;
-
-public class NoteEditorActivity extends AppCompatActivity {
-
-    private EditText etTitle, etContent;
-    private RadioGroup rgCategory;
-    private Button btnSave, btnBack;
-    private NoteDatabaseHelper dbHelper;
-    private Note currentNote;
-    private boolean isEditing = false;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
-
-        dbHelper = new NoteDatabaseHelper(this);
-        initViews();
-
-        long noteId = getIntent().getLongExtra("note_id", -1);
-        if (noteId != -1) {
-            isEditing = true;
-            // Carregar nota para edição
-            loadNoteData(noteId);
-        }
-
-        setupListeners();
-    }
-
-    private void initViews() {
-        etTitle = findViewById(R.id.etTitle);
-        etContent = findViewById(R.id.etContent);
-        rgCategory = findViewById(R.id.rgCategory);
-        btnSave = findViewById(R.id.btnSave);
-        btnBack = findViewById(R.id.btnBack);
-    }
-
-    private void loadNoteData(long noteId) {
-        // Buscar e preencher
-        for (Note n : dbHelper.getNotes("todas", false, "")) {
-            if (n.getId() == noteId) {
-                currentNote = n;
-                etTitle.setText(n.getTitle());
-                etContent.setText(n.getContent());
-                switch (n.getCategory()) {
-                    case "trabalho":
-                        rgCategory.check(R.id.rbTrabalho);
-                        break;
-                    case "pessoal":
-                        rgCategory.check(R.id.rbPessoal);
-                        break;
-                    default:
-                        rgCategory.check(R.id.rbEstudos);
-                        break;
-                }
-                break;
-            }
-        }
-    }
-
-    private void setupListeners() {
-        btnBack.setOnClickListener(v -> handleBackWithConfirmation());
-        btnSave.setOnClickListener(v -> saveNote());
-    }
-
-    private void saveNote() {
-        String title = etTitle.getText().toString().trim();
-        String content = etContent.getText().toString().trim();
-
-        if (title.isEmpty()) {
-            etTitle.setError("Informe um título para salvar a anotação");
-            etTitle.requestFocus();
-            return;
-        }
-
-        String category = "estudos";
-        int checkedId = rgCategory.getCheckedRadioButtonId();
-        if (checkedId == R.id.rbTrabalho) {
-            category = "trabalho";
-        } else if (checkedId == R.id.rbPessoal) {
-            category = "pessoal";
-        }
-
-        if (isEditing && currentNote != null) {
-            currentNote.setTitle(title);
-            currentNote.setContent(content);
-            currentNote.setCategory(category);
-            dbHelper.updateNote(currentNote);
-            Toast.makeText(this, "Anotação atualizada com sucesso!", Toast.LENGTH_SHORT).show();
-        } else {
-            Note newNote = new Note(title, content, category);
-            dbHelper.insertNote(newNote);
-            Toast.makeText(this, "Anotação salva com sucesso!", Toast.LENGTH_SHORT).show();
-        }
-
-        finish();
-    }
-
-    private void handleBackWithConfirmation() {
-        if (!etTitle.getText().toString().trim().isEmpty() || !etContent.getText().toString().trim().isEmpty()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Descartar alterações?")
-                    .setMessage("Você tem alterações não salvas. Deseja realmente voltar?")
-                    .setPositiveButton("Descartar", (dialog, which) -> finish())
-                    .setNegativeButton("Continuar Editando", null)
-                    .show();
-        } else {
-            finish();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        handleBackWithConfirmation();
-    }
-}
-`,
+    "name": "MainActivity.java",
+    "path": "app/src/main/java/com/blocodenotas/app/MainActivity.java",
+    "language": "java",
+    "category": "android",
+    "description": "Tela principal do aplicativo Android com lista de notas, pesquisa e categorias",
+    "content": "package com.blocodenotas.app;\n\nimport android.content.DialogInterface;\nimport android.content.Intent;\nimport android.os.Bundle;\nimport android.text.Editable;\nimport android.text.TextWatcher;\nimport android.view.View;\nimport android.widget.EditText;\nimport androidx.appcompat.app.AlertDialog;\nimport androidx.appcompat.app.AppCompatActivity;\nimport androidx.appcompat.app.AppCompatDelegate;\nimport androidx.recyclerview.widget.LinearLayoutManager;\nimport androidx.recyclerview.widget.RecyclerView;\nimport com.google.android.material.bottomnavigation.BottomNavigationView;\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\nimport com.blocodenotas.app.adapter.NoteAdapter;\nimport com.blocodenotas.app.database.NoteDatabaseHelper;\nimport com.blocodenotas.app.model.Note;\n\nimport java.util.List;\n\npublic class MainActivity extends AppCompatActivity implements NoteAdapter.OnNoteClickListener {\n\n    private RecyclerView recyclerView;\n    private NoteAdapter adapter;\n    private NoteDatabaseHelper dbHelper;\n    private EditText etSearch;\n    private BottomNavigationView bottomNav;\n    private FloatingActionButton fabNewNote;\n\n    private String currentCategory = \"todas\";\n    private boolean isFavoritesOnly = false;\n    private String currentSearchText = \"\";\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n\n        dbHelper = new NoteDatabaseHelper(this);\n\n        initViews();\n        setupRecyclerView();\n        setupListeners();\n        loadNotes();\n    }\n\n    private void initViews() {\n        recyclerView = findViewById(R.id.recyclerViewNotes);\n        etSearch = findViewById(R.id.etSearch);\n        bottomNav = findViewById(R.id.bottomNavigation);\n        fabNewNote = findViewById(R.id.fabNewNote);\n    }\n\n    private void setupRecyclerView() {\n        recyclerView.setLayoutManager(new LinearLayoutManager(this));\n        adapter = new NoteAdapter(this, this);\n        recyclerView.setAdapter(adapter);\n    }\n\n    private void setupListeners() {\n        // Nova Anotação\n        fabNewNote.setOnClickListener(v -> {\n            Intent intent = new Intent(MainActivity.this, NoteEditorActivity.class);\n            startActivity(intent);\n        });\n\n        // Pesquisar em tempo real\n        etSearch.addTextChangedListener(new TextWatcher() {\n            @Override\n            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}\n\n            @Override\n            public void onTextChanged(CharSequence s, int start, int before, int count) {\n                currentSearchText = s.toString();\n                loadNotes();\n            }\n\n            @Override\n            public void afterTextChanged(Editable s) {}\n        });\n\n        // Categorias via Bottom Navigation (Estudos, Trabalho, Pessoal, Favoritos)\n        bottomNav.setOnItemSelectedListener(item -> {\n            int id = item.getItemId();\n            if (id == R.id.nav_all) {\n                currentCategory = \"todas\";\n                isFavoritesOnly = false;\n            } else if (id == R.id.nav_estudos) {\n                currentCategory = \"estudos\";\n                isFavoritesOnly = false;\n            } else if (id == R.id.nav_trabalho) {\n                currentCategory = \"trabalho\";\n                isFavoritesOnly = false;\n            } else if (id == R.id.nav_pessoal) {\n                currentCategory = \"pessoal\";\n                isFavoritesOnly = false;\n            } else if (id == R.id.nav_favorites) {\n                currentCategory = \"todas\";\n                isFavoritesOnly = true;\n            }\n            loadNotes();\n            return true;\n        });\n\n        // Botão Sair com Diálogo de Confirmação\n        findViewById(R.id.btnExit).setOnClickListener(v -> showExitConfirmationDialog());\n\n        // Botão Modo Escuro\n        findViewById(R.id.btnToggleTheme).setOnClickListener(v -> toggleDarkMode());\n    }\n\n    private void loadNotes() {\n        List<Note> notes = dbHelper.getNotes(currentCategory, isFavoritesOnly, currentSearchText);\n        adapter.setNotes(notes);\n    }\n\n    @Override\n    protected void onResume() {\n        super.onResume();\n        loadNotes();\n    }\n\n    @Override\n    public void onNoteClick(Note note) {\n        // Visualizar Anotação Completa\n        Intent intent = new Intent(this, NoteViewerActivity.class);\n        intent.putExtra(\"note_id\", note.getId());\n        startActivity(intent);\n    }\n\n    @Override\n    public void onNoteEdit(Note note) {\n        // Editar Anotação\n        Intent intent = new Intent(this, NoteEditorActivity.class);\n        intent.putExtra(\"note_id\", note.getId());\n        startActivity(intent);\n    }\n\n    @Override\n    public void onNoteDelete(Note note) {\n        // Excluir com Diálogo de Confirmação\n        new AlertDialog.Builder(this)\n                .setTitle(\"Excluir Anotação\")\n                .setMessage(\"Tem certeza de que deseja excluir \\\"\" + note.getTitle() + \"\\\" ?\")\n                .setPositiveButton(\"Excluir\", (dialog, which) -> {\n                    dbHelper.deleteNote(note.getId());\n                    loadNotes();\n                })\n                .setNegativeButton(\"Cancelar\", null)\n                .show();\n    }\n\n    @Override\n    public void onNoteFavoriteToggle(Note note) {\n        boolean nextState = !note.isFavorite();\n        dbHelper.toggleFavorite(note.getId(), nextState);\n        loadNotes();\n    }\n\n    private void showExitConfirmationDialog() {\n        new AlertDialog.Builder(this)\n                .setTitle(\"Sair do Bloco de Notas\")\n                .setMessage(\"Deseja realmente sair? Suas anotações estão todas gravadas com segurança no dispositivo.\")\n                .setPositiveButton(\"Sair\", (dialog, which) -> finish())\n                .setNegativeButton(\"Continuar no App\", null)\n                .show();\n    }\n\n    private void toggleDarkMode() {\n        int currentMode = AppCompatDelegate.getDefaultNightMode();\n        if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) {\n            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);\n        } else {\n            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);\n        }\n    }\n}\n"
   },
   {
-    name: 'NoteViewerActivity.java',
-    path: 'app/src/main/java/com/blocodenotas/app/NoteViewerActivity.java',
-    language: 'java',
-    description: 'Tela de leitura e visualização completa da anotação com botão copiar, editar e excluir',
-    content: `package com.blocodenotas.app;
-
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import com.blocodenotas.app.database.NoteDatabaseHelper;
-import com.blocodenotas.app.model.Note;
-
-public class NoteViewerActivity extends AppCompatActivity {
-
-    private TextView tvTitle, tvContent, tvCategory, tvDate;
-    private Button btnBack, btnEdit, btnDelete, btnCopy;
-    private NoteDatabaseHelper dbHelper;
-    private Note currentNote;
-    private long noteId;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewer);
-
-        dbHelper = new NoteDatabaseHelper(this);
-        noteId = getIntent().getLongExtra("note_id", -1);
-
-        initViews();
-        loadNote();
-        setupListeners();
-    }
-
-    private void initViews() {
-        tvTitle = findViewById(R.id.tvTitle);
-        tvContent = findViewById(R.id.tvContent);
-        tvCategory = findViewById(R.id.tvCategory);
-        tvDate = findViewById(R.id.tvDate);
-        btnBack = findViewById(R.id.btnBack);
-        btnEdit = findViewById(R.id.btnEdit);
-        btnDelete = findViewById(R.id.btnDelete);
-        btnCopy = findViewById(R.id.btnCopy);
-    }
-
-    private void loadNote() {
-        for (Note n : dbHelper.getNotes("todas", false, "")) {
-            if (n.getId() == noteId) {
-                currentNote = n;
-                tvTitle.setText(n.getTitle());
-                tvContent.setText(n.getContent());
-                tvCategory.setText(n.getCategory().toUpperCase());
-                tvDate.setText("Atualizado em " + n.getFormattedDate());
-                break;
-            }
-        }
-    }
-
-    private void setupListeners() {
-        btnBack.setOnClickListener(v -> finish());
-
-        btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(this, NoteEditorActivity.class);
-            intent.putExtra("note_id", noteId);
-            startActivity(intent);
-            finish();
-        });
-
-        btnCopy.setOnClickListener(v -> {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Anotação", currentNote.getTitle() + "\\n\\n" + currentNote.getContent());
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, "Conteúdo copiado para a área de transferência!", Toast.LENGTH_SHORT).show();
-        });
-
-        btnDelete.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Excluir Anotação")
-                    .setMessage("Tem certeza de que deseja remover esta anotação?")
-                    .setPositiveButton("Excluir", (dialog, which) -> {
-                        dbHelper.deleteNote(noteId);
-                        Toast.makeText(this, "Anotação excluída.", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .setNegativeButton("Cancelar", null)
-                    .show();
-        });
-    }
-}
-`,
+    "name": "NoteEditorActivity.java",
+    "path": "app/src/main/java/com/blocodenotas/app/NoteEditorActivity.java",
+    "language": "java",
+    "category": "android",
+    "description": "Tela de criação e edição de anotações com botão salvar, voltar e seleção de categoria",
+    "content": "package com.blocodenotas.app;\n\nimport android.os.Bundle;\nimport android.widget.Button;\nimport android.widget.EditText;\nimport android.widget.RadioGroup;\nimport android.widget.Toast;\nimport androidx.appcompat.app.AlertDialog;\nimport androidx.appcompat.app.AppCompatActivity;\nimport com.blocodenotas.app.database.NoteDatabaseHelper;\nimport com.blocodenotas.app.model.Note;\n\npublic class NoteEditorActivity extends AppCompatActivity {\n\n    private EditText etTitle, etContent;\n    private RadioGroup rgCategory;\n    private Button btnSave, btnBack;\n    private NoteDatabaseHelper dbHelper;\n    private Note currentNote;\n    private boolean isEditing = false;\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_editor);\n\n        dbHelper = new NoteDatabaseHelper(this);\n        initViews();\n\n        long noteId = getIntent().getLongExtra(\"note_id\", -1);\n        if (noteId != -1) {\n            isEditing = true;\n            // Carregar nota para edição\n            loadNoteData(noteId);\n        }\n\n        setupListeners();\n    }\n\n    private void initViews() {\n        etTitle = findViewById(R.id.etTitle);\n        etContent = findViewById(R.id.etContent);\n        rgCategory = findViewById(R.id.rgCategory);\n        btnSave = findViewById(R.id.btnSave);\n        btnBack = findViewById(R.id.btnBack);\n    }\n\n    private void loadNoteData(long noteId) {\n        // Buscar e preencher\n        for (Note n : dbHelper.getNotes(\"todas\", false, \"\")) {\n            if (n.getId() == noteId) {\n                currentNote = n;\n                etTitle.setText(n.getTitle());\n                etContent.setText(n.getContent());\n                switch (n.getCategory()) {\n                    case \"trabalho\":\n                        rgCategory.check(R.id.rbTrabalho);\n                        break;\n                    case \"pessoal\":\n                        rgCategory.check(R.id.rbPessoal);\n                        break;\n                    default:\n                        rgCategory.check(R.id.rbEstudos);\n                        break;\n                }\n                break;\n            }\n        }\n    }\n\n    private void setupListeners() {\n        btnBack.setOnClickListener(v -> handleBackWithConfirmation());\n        btnSave.setOnClickListener(v -> saveNote());\n    }\n\n    private void saveNote() {\n        String title = etTitle.getText().toString().trim();\n        String content = etContent.getText().toString().trim();\n\n        if (title.isEmpty()) {\n            etTitle.setError(\"Informe um título para salvar a anotação\");\n            etTitle.requestFocus();\n            return;\n        }\n\n        String category = \"estudos\";\n        int checkedId = rgCategory.getCheckedRadioButtonId();\n        if (checkedId == R.id.rbTrabalho) {\n            category = \"trabalho\";\n        } else if (checkedId == R.id.rbPessoal) {\n            category = \"pessoal\";\n        }\n\n        if (isEditing && currentNote != null) {\n            currentNote.setTitle(title);\n            currentNote.setContent(content);\n            currentNote.setCategory(category);\n            dbHelper.updateNote(currentNote);\n            Toast.makeText(this, \"Anotação atualizada com sucesso!\", Toast.LENGTH_SHORT).show();\n        } else {\n            Note newNote = new Note(title, content, category);\n            dbHelper.insertNote(newNote);\n            Toast.makeText(this, \"Anotação salva com sucesso!\", Toast.LENGTH_SHORT).show();\n        }\n\n        finish();\n    }\n\n    private void handleBackWithConfirmation() {\n        if (!etTitle.getText().toString().trim().isEmpty() || !etContent.getText().toString().trim().isEmpty()) {\n            new AlertDialog.Builder(this)\n                    .setTitle(\"Descartar alterações?\")\n                    .setMessage(\"Você tem alterações não salvas. Deseja realmente voltar?\")\n                    .setPositiveButton(\"Descartar\", (dialog, which) -> finish())\n                    .setNegativeButton(\"Continuar Editando\", null)\n                    .show();\n        } else {\n            finish();\n        }\n    }\n\n    @Override\n    public void onBackPressed() {\n        handleBackWithConfirmation();\n    }\n}\n"
   },
   {
-    name: 'NoteAdapter.java',
-    path: 'app/src/main/java/com/blocodenotas/app/adapter/NoteAdapter.java',
-    language: 'java',
-    description: 'Adapter do RecyclerView que desenha os cartões modernos de anotações',
-    content: `package com.blocodenotas.app.adapter;
-
-import android.content.Context;
-import android.graphics.Color;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.card.MaterialCardView;
-import com.blocodenotas.app.R;
-import com.blocodenotas.app.model.Note;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
-
-    private final Context context;
-    private final OnNoteClickListener listener;
-    private List<Note> notes = new ArrayList<>();
-
-    public interface OnNoteClickListener {
-        void onNoteClick(Note note);
-        void onNoteEdit(Note note);
-        void onNoteDelete(Note note);
-        void onNoteFavoriteToggle(Note note);
-    }
-
-    public NoteAdapter(Context context, OnNoteClickListener listener) {
-        this.context = context;
-        this.listener = listener;
-    }
-
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
-        notifyDataSetChanged();
-    }
-
-    @NonNull
-    @Override
-    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_note, parent, false);
-        return new NoteViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-        Note note = notes.get(position);
-        holder.tvTitle.setText(note.getTitle());
-        holder.tvContentPreview.setText(note.getContent());
-        holder.tvDate.setText(note.getFormattedDate());
-        holder.tvCategory.setText(note.getCategory().toUpperCase());
-
-        // Paleta de Cores: Azul (Estudos), Verde (Trabalho), Lilás (Pessoal)
-        if ("estudos".equalsIgnoreCase(note.getCategory())) {
-            holder.tvCategory.setBackgroundColor(Color.parseColor("#DBEAFE")); // Azul suave
-            holder.tvCategory.setTextColor(Color.parseColor("#1E40AF"));
-        } else if ("trabalho".equalsIgnoreCase(note.getCategory())) {
-            holder.tvCategory.setBackgroundColor(Color.parseColor("#D1FAE5")); // Verde esmeralda
-            holder.tvCategory.setTextColor(Color.parseColor("#065F46"));
-        } else {
-            holder.tvCategory.setBackgroundColor(Color.parseColor("#EDE9FE")); // Lilás suave
-            holder.tvCategory.setTextColor(Color.parseColor("#5B21B6"));
-        }
-
-        // Ícone de favorito
-        if (note.isFavorite()) {
-            holder.btnFavorite.setImageResource(android.R.drawable.star_big_on);
-        } else {
-            holder.btnFavorite.setImageResource(android.R.drawable.star_big_off);
-        }
-
-        holder.cardView.setOnClickListener(v -> listener.onNoteClick(note));
-        holder.btnFavorite.setOnClickListener(v -> listener.onNoteFavoriteToggle(note));
-        holder.btnEdit.setOnClickListener(v -> listener.onNoteEdit(note));
-        holder.btnDelete.setOnClickListener(v -> listener.onNoteDelete(note));
-    }
-
-    @Override
-    public int getItemCount() {
-        return notes.size();
-    }
-
-    static class NoteViewHolder extends RecyclerView.ViewHolder {
-        MaterialCardView cardView;
-        TextView tvTitle, tvContentPreview, tvCategory, tvDate;
-        ImageButton btnFavorite, btnEdit, btnDelete;
-
-        public NoteViewHolder(@NonNull View itemView) {
-            super(itemView);
-            cardView = itemView.findViewById(R.id.cardView);
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvContentPreview = itemView.findViewById(R.id.tvContentPreview);
-            tvCategory = itemView.findViewById(R.id.tvCategory);
-            tvDate = itemView.findViewById(R.id.tvDate);
-            btnFavorite = itemView.findViewById(R.id.btnFavorite);
-            btnEdit = itemView.findViewById(R.id.btnEdit);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
-        }
-    }
-}
-`,
+    "name": "NoteViewerActivity.java",
+    "path": "app/src/main/java/com/blocodenotas/app/NoteViewerActivity.java",
+    "language": "java",
+    "category": "android",
+    "description": "Tela de leitura e visualização completa da anotação com botão copiar, editar e excluir",
+    "content": "package com.blocodenotas.app;\n\nimport android.content.ClipData;\nimport android.content.ClipboardManager;\nimport android.content.Context;\nimport android.content.Intent;\nimport android.os.Bundle;\nimport android.widget.Button;\nimport android.widget.TextView;\nimport android.widget.Toast;\nimport androidx.appcompat.app.AlertDialog;\nimport androidx.appcompat.app.AppCompatActivity;\nimport com.blocodenotas.app.database.NoteDatabaseHelper;\nimport com.blocodenotas.app.model.Note;\n\npublic class NoteViewerActivity extends AppCompatActivity {\n\n    private TextView tvTitle, tvContent, tvCategory, tvDate;\n    private Button btnBack, btnEdit, btnDelete, btnCopy;\n    private NoteDatabaseHelper dbHelper;\n    private Note currentNote;\n    private long noteId;\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_viewer);\n\n        dbHelper = new NoteDatabaseHelper(this);\n        noteId = getIntent().getLongExtra(\"note_id\", -1);\n\n        initViews();\n        loadNote();\n        setupListeners();\n    }\n\n    private void initViews() {\n        tvTitle = findViewById(R.id.tvTitle);\n        tvContent = findViewById(R.id.tvContent);\n        tvCategory = findViewById(R.id.tvCategory);\n        tvDate = findViewById(R.id.tvDate);\n        btnBack = findViewById(R.id.btnBack);\n        btnEdit = findViewById(R.id.btnEdit);\n        btnDelete = findViewById(R.id.btnDelete);\n        btnCopy = findViewById(R.id.btnCopy);\n    }\n\n    private void loadNote() {\n        for (Note n : dbHelper.getNotes(\"todas\", false, \"\")) {\n            if (n.getId() == noteId) {\n                currentNote = n;\n                tvTitle.setText(n.getTitle());\n                tvContent.setText(n.getContent());\n                tvCategory.setText(n.getCategory().toUpperCase());\n                tvDate.setText(n.getFormattedDate());\n                break;\n            }\n        }\n    }\n\n    private void setupListeners() {\n        btnBack.setOnClickListener(v -> finish());\n\n        btnEdit.setOnClickListener(v -> {\n            Intent intent = new Intent(this, NoteEditorActivity.class);\n            intent.putExtra(\"note_id\", noteId);\n            startActivity(intent);\n            finish();\n        });\n\n        btnDelete.setOnClickListener(v -> {\n            new AlertDialog.Builder(this)\n                    .setTitle(\"Excluir Anotação\")\n                    .setMessage(\"Tem certeza de que deseja excluir permanentemente?\")\n                    .setPositiveButton(\"Excluir\", (dialog, which) -> {\n                        dbHelper.deleteNote(noteId);\n                        Toast.makeText(this, \"Anotação excluída.\", Toast.LENGTH_SHORT).show();\n                        finish();\n                    })\n                    .setNegativeButton(\"Cancelar\", null)\n                    .show();\n        });\n\n        btnCopy.setOnClickListener(v -> {\n            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);\n            ClipData clip = ClipData.newPlainText(\"Nota\", tvTitle.getText() + \"\\n\\n\" + tvContent.getText());\n            clipboard.setPrimaryClip(clip);\n            Toast.makeText(this, \"Conteúdo copiado para a área de transferência!\", Toast.LENGTH_SHORT).show();\n        });\n    }\n}\n"
   },
   {
-    name: 'activity_main.xml',
-    path: 'app/src/main/res/layout/activity_main.xml',
-    language: 'xml',
-    description: 'Layout da tela principal com barra de pesquisa, cards e barra de navegação inferior',
-    content: `<?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F8FAFC">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        app:elevation="2dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bloco de Notas"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#0F172A" />
-
-            <ImageButton
-                android:id="@+id/btnToggleTheme"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_day"
-                android:contentDescription="Modo Escuro" />
-
-            <ImageButton
-                android:id="@+id/btnExit"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_lock_power_off"
-                android:contentDescription="Sair" />
-        </LinearLayout>
-
-        <!-- Barra de Pesquisa -->
-        <EditText
-            android:id="@+id/etSearch"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_search_input"
-            android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="12dp"
-            android:hint="Pesquisar por título ou conteúdo..."
-            android:paddingHorizontal="16dp"
-            android:textSize="14sp" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Lista de Anotações -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewNotes"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <!-- Botão Flutuante: Nova Anotação -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabNewNote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:layout_marginBottom="80dp"
-        android:backgroundTint="#2563EB"
-        android:src="@android:drawable/ic_input_add"
-        app:tint="#FFFFFF"
-        android:contentDescription="Nova Anotação" />
-
-    <!-- Navegação Inferior de Categorias -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_gravity="bottom"
-        android:background="#FFFFFF"
-        app:menu="@menu/bottom_nav_menu" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-`,
+    "name": "NoteAdapter.java",
+    "path": "app/src/main/java/com/blocodenotas/app/adapter/NoteAdapter.java",
+    "language": "java",
+    "category": "android",
+    "description": "Adapter do RecyclerView que renderiza os cartões modernos com cantos suaves e botões",
+    "content": "package com.blocodenotas.app.adapter;\n\nimport android.content.Context;\nimport android.graphics.Color;\nimport android.view.LayoutInflater;\nimport android.view.View;\nimport android.view.ViewGroup;\nimport android.widget.ImageButton;\nimport android.widget.TextView;\nimport androidx.annotation.NonNull;\nimport androidx.recyclerview.widget.RecyclerView;\nimport com.blocodenotas.app.R;\nimport com.blocodenotas.app.model.Note;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {\n\n    public interface OnNoteClickListener {\n        void onNoteClick(Note note);\n        void onNoteEdit(Note note);\n        void onNoteDelete(Note note);\n        void onNoteFavoriteToggle(Note note);\n    }\n\n    private final Context context;\n    private final OnNoteClickListener listener;\n    private List<Note> notes = new ArrayList<>();\n\n    public NoteAdapter(Context context, OnNoteClickListener listener) {\n        this.context = context;\n        this.listener = listener;\n    }\n\n    public void setNotes(List<Note> notes) {\n        this.notes = notes;\n        notifyDataSetChanged();\n    }\n\n    @NonNull\n    @Override\n    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {\n        View view = LayoutInflater.from(context).inflate(R.layout.item_note, parent, false);\n        return new NoteViewHolder(view);\n    }\n\n    @Override\n    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {\n        Note note = notes.get(position);\n        holder.bind(note, listener);\n    }\n\n    @Override\n    public int getItemCount() {\n        return notes.size();\n    }\n\n    static class NoteViewHolder extends RecyclerView.ViewHolder {\n        private final TextView tvTitle, tvContentPreview, tvCategory, tvDate;\n        private final ImageButton btnFavorite, btnEdit, btnDelete;\n\n        public NoteViewHolder(@NonNull View itemView) {\n            super(itemView);\n            tvTitle = itemView.findViewById(R.id.tvTitle);\n            tvContentPreview = itemView.findViewById(R.id.tvContentPreview);\n            tvCategory = itemView.findViewById(R.id.tvCategory);\n            tvDate = itemView.findViewById(R.id.tvDate);\n            btnFavorite = itemView.findViewById(R.id.btnFavorite);\n            btnEdit = itemView.findViewById(R.id.btnEdit);\n            btnDelete = itemView.findViewById(R.id.btnDelete);\n        }\n\n        public void bind(Note note, OnNoteClickListener listener) {\n            tvTitle.setText(note.getTitle());\n            tvContentPreview.setText(note.getContent());\n            tvDate.setText(note.getFormattedDate());\n\n            // Cores suaves por categoria\n            switch (note.getCategory().toLowerCase()) {\n                case \"trabalho\":\n                    tvCategory.setText(\"TRABALHO\");\n                    tvCategory.setBackgroundColor(Color.parseColor(\"#D1FAE5\")); // Verde suave\n                    tvCategory.setTextColor(Color.parseColor(\"#065F46\"));\n                    break;\n                case \"pessoal\":\n                    tvCategory.setText(\"PESSOAL\");\n                    tvCategory.setBackgroundColor(Color.parseColor(\"#EDE9FE\")); // Lilás suave\n                    tvCategory.setTextColor(Color.parseColor(\"#5B21B6\"));\n                    break;\n                default:\n                    tvCategory.setText(\"ESTUDOS\");\n                    tvCategory.setBackgroundColor(Color.parseColor(\"#DBEAFE\")); // Azul suave\n                    tvCategory.setTextColor(Color.parseColor(\"#1E40AF\"));\n                    break;\n            }\n\n            // Ícone Favorito\n            if (note.isFavorite()) {\n                btnFavorite.setImageResource(android.R.drawable.star_big_on);\n            } else {\n                btnFavorite.setImageResource(android.R.drawable.star_big_off);\n            }\n\n            // Cliques\n            itemView.setOnClickListener(v -> listener.onNoteClick(note));\n            btnEdit.setOnClickListener(v -> listener.onNoteEdit(note));\n            btnDelete.setOnClickListener(v -> listener.onNoteDelete(note));\n            btnFavorite.setOnClickListener(v -> listener.onNoteFavoriteToggle(note));\n        }\n    }\n}\n"
   },
   {
-    name: 'item_note.xml',
-    path: 'app/src/main/res/layout/item_note.xml',
-    language: 'xml',
-    description: 'Layout moderno dos cartões de notas com cantos arredondados e botões suaves',
-    content: `<?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginVertical="6dp"
-    android:clickable="true"
-    android:focusable="true"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="2dp"
-    app:strokeColor="#E2E8F0"
-    app:strokeWidth="1dp"
-    app:cardBackgroundColor="#FFFFFF">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- Tag de Categoria com cantos arredondados -->
-            <TextView
-                android:id="@+id/tvCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ESTUDOS"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:background="#DBEAFE"
-                android:textColor="#1E40AF" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ImageButton
-                android:id="@+id/btnFavorite"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/star_big_off" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Título da Anotação"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#0F172A" />
-
-        <TextView
-            android:id="@+id/tvContentPreview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:text="Prévia do conteúdo detalhado da anotação com leitura agradável e contraste ideal..."
-            android:textSize="13sp"
-            android:textColor="#64748B" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:background="#F1F5F9" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="16/10/2026 10:30"
-                android:textSize="12sp"
-                android:textColor="#94A3B8" />
-
-            <ImageButton
-                android:id="@+id/btnEdit"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_edit" />
-
-            <ImageButton
-                android:id="@+id/btnDelete"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_delete" />
-        </LinearLayout>
-
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
-`,
+    "name": "activity_main.xml",
+    "path": "app/src/main/res/layout/activity_main.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Layout da tela principal com barra de pesquisa, cards e navegação inferior",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.coordinatorlayout.widget.CoordinatorLayout \n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    android:background=\"#F8FAFC\">\n\n    <LinearLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"match_parent\"\n        android:orientation=\"vertical\">\n\n        <!-- Top Header com Título, Modo Escuro e Sair -->\n        <LinearLayout\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:orientation=\"horizontal\"\n            android:padding=\"16dp\"\n            android:background=\"#FFFFFF\"\n            android:elevation=\"2dp\"\n            android:gravity=\"center_vertical\">\n\n            <LinearLayout\n                android:layout_width=\"0dp\"\n                android:layout_height=\"wrap_content\"\n                android:layout_weight=\"1\"\n                android:orientation=\"vertical\">\n\n                <TextView\n                    android:layout_width=\"wrap_content\"\n                    android:layout_height=\"wrap_content\"\n                    android:text=\"Bloco de Notas\"\n                    android:textSize=\"20sp\"\n                    android:textStyle=\"bold\"\n                    android:textColor=\"#0F172A\" />\n\n                <TextView\n                    android:layout_width=\"wrap_content\"\n                    android:layout_height=\"wrap_content\"\n                    android:text=\"Moderno • Acessível • Java\"\n                    android:textSize=\"12sp\"\n                    android:textColor=\"#059669\" />\n            </LinearLayout>\n\n            <ImageButton\n                android:id=\"@+id/btnToggleTheme\"\n                android:layout_width=\"40dp\"\n                android:layout_height=\"40dp\"\n                android:background=\"?attr/selectableItemBackgroundBorderless\"\n                android:src=\"@android:drawable/ic_menu_day\"\n                android:contentDescription=\"Alternar Modo Escuro\" />\n\n            <ImageButton\n                android:id=\"@+id/btnExit\"\n                android:layout_width=\"40dp\"\n                android:layout_height=\"40dp\"\n                android:background=\"?attr/selectableItemBackgroundBorderless\"\n                android:src=\"@android:drawable/ic_lock_power_off\"\n                android:contentDescription=\"Sair do aplicativo\" />\n        </LinearLayout>\n\n        <!-- Barra de Pesquisa com cantos arredondados -->\n        <androidx.cardview.widget.CardView\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"48dp\"\n            android:layout_margin=\"12dp\"\n            app:cardCornerRadius=\"16dp\"\n            app:cardElevation=\"2dp\"\n            app:cardBackgroundColor=\"#F1F5F9\">\n\n            <EditText\n                android:id=\"@+id/etSearch\"\n                android:layout_width=\"match_parent\"\n                android:layout_height=\"match_parent\"\n                android:background=\"@null\"\n                android:hint=\"Pesquisar anotações...\"\n                android:paddingHorizontal=\"16dp\"\n                android:drawableStart=\"@android:drawable/ic_menu_search\"\n                android:drawablePadding=\"10dp\"\n                android:textSize=\"14sp\" />\n        </androidx.cardview.widget.CardView>\n\n        <!-- Lista de Anotações (RecyclerView) -->\n        <androidx.recyclerview.widget.RecyclerView\n            android:id=\"@+id/recyclerViewNotes\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"0dp\"\n            android:layout_weight=\"1\"\n            android:paddingHorizontal=\"12dp\"\n            android:clipToPadding=\"false\"\n            android:paddingBottom=\"80dp\" />\n\n        <!-- Bottom Navigation: Categorias -->\n        <com.google.android.material.bottomnavigation.BottomNavigationView\n            android:id=\"@+id/bottomNavigation\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:background=\"#FFFFFF\"\n            app:menu=\"@menu/bottom_nav_menu\" />\n    </LinearLayout>\n\n    <!-- Botão Flutuante (+ Nova Anotação) -->\n    <com.google.android.material.floatingactionbutton.FloatingActionButton\n        android:id=\"@+id/fabNewNote\"\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:layout_gravity=\"bottom|end\"\n        android:layout_marginEnd=\"16dp\"\n        android:layout_marginBottom=\"72dp\"\n        android:src=\"@android:drawable/ic_input_add\"\n        app:backgroundTint=\"#2563EB\"\n        app:tint=\"#FFFFFF\"\n        android:contentDescription=\"Nova Anotação\" />\n\n</androidx.coordinatorlayout.widget.CoordinatorLayout>\n"
   },
   {
-    name: 'AndroidManifest.xml',
-    path: 'app/src/main/AndroidManifest.xml',
-    language: 'xml',
-    description: 'Manifesto da aplicação Android',
-    content: `<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.blocodenotas.app">
-
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Bloco de Notas"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
-        
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".NoteEditorActivity"
-            android:label="Editar Anotação" />
-
-        <activity
-            android:name=".NoteViewerActivity"
-            android:label="Visualizar Anotação" />
-
-    </application>
-
-</manifest>
-`,
+    "name": "activity_editor.xml",
+    "path": "app/src/main/res/layout/activity_editor.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Layout da tela de criação e edição com campos de título, categoria e conteúdo",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    android:orientation=\"vertical\"\n    android:background=\"#F8FAFC\"\n    android:padding=\"16dp\">\n\n    <!-- Top Bar with Back and Save -->\n    <LinearLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:orientation=\"horizontal\"\n        android:gravity=\"center_vertical\"\n        android:layout_marginBottom=\"16dp\">\n\n        <Button\n            android:id=\"@+id/btnBack\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"← Voltar\"\n            style=\"@style/Widget.MaterialComponents.Button.TextButton\"\n            android:textColor=\"#2563EB\" />\n\n        <View\n            android:layout_width=\"0dp\"\n            android:layout_height=\"0dp\"\n            android:layout_weight=\"1\" />\n\n        <Button\n            android:id=\"@+id/btnSave\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Salvar\"\n            android:backgroundTint=\"#2563EB\"\n            android:textColor=\"#FFFFFF\" />\n    </LinearLayout>\n\n    <!-- Title Input -->\n    <com.google.android.material.textfield.TextInputLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:hint=\"Título da Anotação\"\n        app:boxStrokeColor=\"#2563EB\"\n        android:layout_marginBottom=\"12dp\">\n\n        <com.google.android.material.textfield.TextInputEditText\n            android:id=\"@+id/etTitle\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:inputType=\"textCapSentences\"\n            android:textSize=\"18sp\"\n            android:textStyle=\"bold\" />\n    </com.google.android.material.textfield.TextInputLayout>\n\n    <!-- Category Selector (RadioGroup: Estudos, Trabalho, Pessoal) -->\n    <TextView\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"Categoria:\"\n        android:textStyle=\"bold\"\n        android:textColor=\"#475569\"\n        android:layout_marginBottom=\"4dp\" />\n\n    <RadioGroup\n        android:id=\"@+id/rgCategory\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:orientation=\"horizontal\"\n        android:layout_marginBottom=\"16dp\">\n\n        <RadioButton\n            android:id=\"@+id/rbEstudos\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Estudos\"\n            android:checked=\"true\"\n            android:textColor=\"#2563EB\" />\n\n        <RadioButton\n            android:id=\"@+id/rbTrabalho\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Trabalho\"\n            android:layout_marginStart=\"16dp\"\n            android:textColor=\"#059669\" />\n\n        <RadioButton\n            android:id=\"@+id/rbPessoal\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Pessoal\"\n            android:layout_marginStart=\"16dp\"\n            android:textColor=\"#7C3AED\" />\n    </RadioGroup>\n\n    <!-- Content Input -->\n    <com.google.android.material.textfield.TextInputLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"0dp\"\n        android:layout_weight=\"1\"\n        android:hint=\"Escreva sua anotação aqui...\"\n        app:boxStrokeColor=\"#2563EB\">\n\n        <com.google.android.material.textfield.TextInputEditText\n            android:id=\"@+id/etContent\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"match_parent\"\n            android:gravity=\"top\"\n            android:inputType=\"textMultiLine\"\n            android:textSize=\"15sp\" />\n    </com.google.android.material.textfield.TextInputLayout>\n\n</LinearLayout>\n"
   },
   {
-    name: 'build.gradle',
-    path: 'app/build.gradle',
-    language: 'groovy',
-    description: 'Configuração do Gradle para compilação no Android Studio',
-    content: `plugins {
-    id 'com.android.application'
-}
-
-android {
-    namespace 'com.blocodenotas.app'
-    compileSdk 34
-
-    defaultConfig {
-        applicationId "com.blocodenotas.app"
-        minSdk 24
-        targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-}
-
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
-    implementation 'androidx.cardview:cardview:1.0.0'
-}
-`,
+    "name": "activity_viewer.xml",
+    "path": "app/src/main/res/layout/activity_viewer.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Layout da tela de leitura detalhada com botões de voltar, copiar, editar e excluir",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    android:orientation=\"vertical\"\n    android:background=\"#F8FAFC\"\n    android:padding=\"16dp\">\n\n    <!-- Top Action Bar (Back, Copy, Edit, Delete) -->\n    <LinearLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:orientation=\"horizontal\"\n        android:gravity=\"center_vertical\"\n        android:layout_marginBottom=\"16dp\">\n\n        <Button\n            android:id=\"@+id/btnBack\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"← Voltar\"\n            style=\"@style/Widget.MaterialComponents.Button.TextButton\"\n            android:textColor=\"#2563EB\" />\n\n        <View\n            android:layout_width=\"0dp\"\n            android:layout_height=\"0dp\"\n            android:layout_weight=\"1\" />\n\n        <Button\n            android:id=\"@+id/btnCopy\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Copiar\"\n            style=\"@style/Widget.MaterialComponents.Button.OutlinedButton\"\n            android:layout_marginEnd=\"6dp\" />\n\n        <Button\n            android:id=\"@+id/btnEdit\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Editar\"\n            android:backgroundTint=\"#059669\"\n            android:textColor=\"#FFFFFF\"\n            android:layout_marginEnd=\"6dp\" />\n\n        <Button\n            android:id=\"@+id/btnDelete\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"Excluir\"\n            android:backgroundTint=\"#E11D48\"\n            android:textColor=\"#FFFFFF\" />\n    </LinearLayout>\n\n    <!-- Category and Date -->\n    <LinearLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:orientation=\"horizontal\"\n        android:gravity=\"center_vertical\"\n        android:layout_marginBottom=\"8dp\">\n\n        <TextView\n            android:id=\"@+id/tvCategory\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:text=\"ESTUDOS\"\n            android:paddingHorizontal=\"10dp\"\n            android:paddingVertical=\"4dp\"\n            android:textStyle=\"bold\"\n            android:textSize=\"12sp\"\n            android:background=\"#DBEAFE\"\n            android:textColor=\"#1E40AF\" />\n\n        <TextView\n            android:id=\"@+id/tvDate\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:layout_marginStart=\"12dp\"\n            android:text=\"16/10/2026 14:00\"\n            android:textSize=\"12sp\"\n            android:textColor=\"#64748B\" />\n    </LinearLayout>\n\n    <!-- Title -->\n    <TextView\n        android:id=\"@+id/tvTitle\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"Título da Anotação\"\n        android:textSize=\"22sp\"\n        android:textStyle=\"bold\"\n        android:textColor=\"#0F172A\"\n        android:layout_marginBottom=\"16dp\" />\n\n    <!-- Content in ScrollView -->\n    <ScrollView\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"0dp\"\n        android:layout_weight=\"1\"\n        android:background=\"@android:color/white\"\n        android:padding=\"16dp\">\n\n        <TextView\n            android:id=\"@+id/tvContent\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:textSize=\"16sp\"\n            android:lineSpacingExtra=\"4dp\"\n            android:textColor=\"#334155\" />\n    </ScrollView>\n\n</LinearLayout>\n"
   },
+  {
+    "name": "item_note.xml",
+    "path": "app/src/main/res/layout/item_note.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Layout do cartão de nota no RecyclerView com tag de categoria, botões de ação e data",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<com.google.android.material.card.MaterialCardView \n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"wrap_content\"\n    android:layout_marginBottom=\"10dp\"\n    app:cardCornerRadius=\"16dp\"\n    app:cardElevation=\"2dp\"\n    app:cardBackgroundColor=\"#FFFFFF\"\n    app:strokeColor=\"#E2E8F0\"\n    app:strokeWidth=\"1dp\">\n\n    <LinearLayout\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"wrap_content\"\n        android:orientation=\"vertical\"\n        android:padding=\"16dp\">\n\n        <LinearLayout\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:orientation=\"horizontal\"\n            android:gravity=\"center_vertical\">\n\n            <!-- Tag de Categoria com cantos arredondados -->\n            <TextView\n                android:id=\"@+id/tvCategory\"\n                android:layout_width=\"wrap_content\"\n                android:layout_height=\"wrap_content\"\n                android:text=\"ESTUDOS\"\n                android:paddingHorizontal=\"10dp\"\n                android:paddingVertical=\"3dp\"\n                android:textSize=\"11sp\"\n                android:textStyle=\"bold\"\n                android:background=\"#DBEAFE\"\n                android:textColor=\"#1E40AF\" />\n\n            <View\n                android:layout_width=\"0dp\"\n                android:layout_height=\"0dp\"\n                android:layout_weight=\"1\" />\n\n            <ImageButton\n                android:id=\"@+id/btnFavorite\"\n                android:layout_width=\"32dp\"\n                android:layout_height=\"32dp\"\n                android:background=\"?attr/selectableItemBackgroundBorderless\"\n                android:src=\"@android:drawable/star_big_off\" />\n        </LinearLayout>\n\n        <TextView\n            android:id=\"@+id/tvTitle\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:layout_marginTop=\"8dp\"\n            android:text=\"Título da Anotação\"\n            android:textSize=\"16sp\"\n            android:textStyle=\"bold\"\n            android:textColor=\"#0F172A\" />\n\n        <TextView\n            android:id=\"@+id/tvContentPreview\"\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:layout_marginTop=\"4dp\"\n            android:maxLines=\"3\"\n            android:ellipsize=\"end\"\n            android:text=\"Prévia do conteúdo detalhado da anotação com leitura agradável e contraste ideal...\"\n            android:textSize=\"13sp\"\n            android:textColor=\"#64748B\" />\n\n        <View\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"1dp\"\n            android:layout_marginTop=\"12dp\"\n            android:background=\"#F1F5F9\" />\n\n        <LinearLayout\n            android:layout_width=\"match_parent\"\n            android:layout_height=\"wrap_content\"\n            android:layout_marginTop=\"8dp\"\n            android:orientation=\"horizontal\"\n            android:gravity=\"center_vertical\">\n\n            <TextView\n                android:id=\"@+id/tvDate\"\n                android:layout_width=\"0dp\"\n                android:layout_height=\"wrap_content\"\n                android:layout_weight=\"1\"\n                android:text=\"16/10/2026 10:30\"\n                android:textSize=\"12sp\"\n                android:textColor=\"#94A3B8\" />\n\n            <ImageButton\n                android:id=\"@+id/btnEdit\"\n                android:layout_width=\"32dp\"\n                android:layout_height=\"32dp\"\n                android:background=\"?attr/selectableItemBackgroundBorderless\"\n                android:src=\"@android:drawable/ic_menu_edit\" />\n\n            <ImageButton\n                android:id=\"@+id/btnDelete\"\n                android:layout_width=\"32dp\"\n                android:layout_height=\"32dp\"\n                android:background=\"?attr/selectableItemBackgroundBorderless\"\n                android:src=\"@android:drawable/ic_menu_delete\" />\n        </LinearLayout>\n\n    </LinearLayout>\n</com.google.android.material.card.MaterialCardView>\n"
+  },
+  {
+    "name": "colors.xml",
+    "path": "app/src/main/res/values/colors.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Paleta de cores em XML: Azul, Verde, Lilás, Amarelo e tons neutros",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n    <!-- Paleta Harmônica do Aplicativo -->\n    <color name=\"primary_blue\">#2563EB</color>\n    <color name=\"primary_blue_light\">#DBEAFE</color>\n    <color name=\"study_blue\">#1D4ED8</color>\n\n    <color name=\"work_green\">#059669</color>\n    <color name=\"work_green_light\">#D1FAE5</color>\n\n    <color name=\"personal_purple\">#7C3AED</color>\n    <color name=\"personal_purple_light\">#EDE9FE</color>\n\n    <color name=\"favorite_yellow\">#F59E0B</color>\n\n    <color name=\"bg_light\">#F8FAFC</color>\n    <color name=\"bg_dark\">#0F172A</color>\n    <color name=\"card_light\">#FFFFFF</color>\n    <color name=\"card_dark\">#1E293B</color>\n    <color name=\"text_primary\">#0F172A</color>\n    <color name=\"text_secondary\">#64748B</color>\n</resources>\n"
+  },
+  {
+    "name": "AndroidManifest.xml",
+    "path": "app/src/main/AndroidManifest.xml",
+    "language": "xml",
+    "category": "android",
+    "description": "Manifesto da aplicação Android com configuração de Activities e permissões",
+    "content": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"com.blocodenotas.app\">\n\n    <application\n        android:allowBackup=\"true\"\n        android:icon=\"@mipmap/ic_launcher\"\n        android:label=\"Bloco de Notas\"\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\n        android:supportsRtl=\"true\"\n        android:theme=\"@style/Theme.MaterialComponents.DayNight.NoActionBar\">\n        \n        <activity\n            android:name=\".MainActivity\"\n            android:exported=\"true\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n\n        <activity\n            android:name=\".NoteEditorActivity\"\n            android:label=\"Editar Anotação\" />\n\n        <activity\n            android:name=\".NoteViewerActivity\"\n            android:label=\"Visualizar Anotação\" />\n\n    </application>\n\n</manifest>\n"
+  },
+  {
+    "name": "build.gradle",
+    "path": "app/build.gradle",
+    "language": "groovy",
+    "category": "android",
+    "description": "Configuração do Gradle para compilação no Android Studio",
+    "content": "plugins {\n    id 'com.android.application'\n}\n\nandroid {\n    namespace 'com.blocodenotas.app'\n    compileSdk 34\n\n    defaultConfig {\n        applicationId \"com.blocodenotas.app\"\n        minSdk 24\n        targetSdk 34\n        versionCode 1\n        versionName \"1.0.0\"\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\n    }\n\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }\n}\n\ndependencies {\n    implementation 'androidx.appcompat:appcompat:1.6.1'\n    implementation 'com.google.android.material:material:1.11.0'\n    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'\n    implementation 'androidx.recyclerview:recyclerview:1.3.2'\n    implementation 'androidx.cardview:cardview:1.0.0'\n}\n"
+  }
 ];

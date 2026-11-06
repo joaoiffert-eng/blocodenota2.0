@@ -7,9 +7,11 @@ import {
   FolderArchive, 
   FileCode, 
   Code2, 
-  ExternalLink,
   Smartphone,
-  Layers
+  Coffee,
+  Terminal,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { JAVA_PROJECT_FILES, JavaProjectFile } from '../data/javaCodeFiles';
 import JSZip from 'jszip';
@@ -26,10 +28,17 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
   onShowToast,
 }) => {
   const [selectedFile, setSelectedFile] = useState<JavaProjectFile>(JAVA_PROJECT_FILES[0]);
+  const [activeCategory, setActiveCategory] = useState<'all' | 'pure_java' | 'android'>('all');
   const [copied, setCopied] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
 
   if (!isOpen) return null;
+
+  const filteredFiles = JAVA_PROJECT_FILES.filter((f) => {
+    if (activeCategory === 'pure_java') return f.category === 'pure_java';
+    if (activeCategory === 'android') return f.category === 'android';
+    return true;
+  });
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(selectedFile.content);
@@ -38,17 +47,17 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownloadSingleFile = () => {
-    const blob = new Blob([selectedFile.content], { type: 'text/plain;charset=utf-8' });
+  const handleDownloadSingleFile = (fileToDownload: JavaProjectFile = selectedFile) => {
+    const blob = new Blob([fileToDownload.content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = selectedFile.name;
+    link.download = fileToDownload.name;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    onShowToast(`Download de ${selectedFile.name} concluído!`, 'info');
+    onShowToast(`Download de ${fileToDownload.name} concluído!`, 'info');
   };
 
   const handleDownloadZip = async () => {
@@ -56,13 +65,51 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
       setIsZipping(true);
       const zip = new JSZip();
 
-      // Add readme
+      // README com instruções detalhadas
       zip.file(
         'README.txt',
-        `PROJETO ANDROID - BLOCO DE NOTAS MODERNO & ACESSÍVEL EM JAVA\n\nInstruções:\n1. Abra o Android Studio.\n2. Crie um novo projeto "Empty Views Activity" ou importe esta pasta.\n3. Copie os arquivos das pastas app/src/main/java e app/src/main/res.\n4. Execute no emulador ou conecte seu celular Android.\n`
+        `==============================================================================
+BLOCO DE NOTAS MODERNO & ACESSÍVEL EM JAVA (CELULAR E ANDROID)
+==============================================================================
+
+Este pacote contém 2 formas de utilizar o aplicativo em Java:
+
+------------------------------------------------------------------------------
+OPÇÃO 1: JAVA PURO EXECUTÁVEL (BlocoDeNotasApp.java)
+------------------------------------------------------------------------------
+Arquivo autônomo com interface gráfica idêntica a um celular (Swing/AWT),
+com suporte a modo escuro, categorias, favoritos, pesquisa e salvamento local.
+
+Como executar em qualquer computador com Java instalado:
+  1. Abra o terminal na pasta deste arquivo.
+  2. Compile:
+       javac BlocoDeNotasApp.java
+  3. Execute:
+       java BlocoDeNotasApp
+
+------------------------------------------------------------------------------
+OPÇÃO 2: PROJETO NATIVO ANDROID STUDIO (PASTA app/)
+------------------------------------------------------------------------------
+Código Java completo para criar o aplicativo nativo (.APK) para instalar
+no celular Android:
+  - Model: Note.java
+  - Database: NoteDatabaseHelper.java (SQLite Local)
+  - Activities: MainActivity.java, NoteEditorActivity.java, NoteViewerActivity.java
+  - Adapter: NoteAdapter.java
+  - Layouts XML com Material Design: activity_main.xml, activity_editor.xml,
+    activity_viewer.xml, item_note.xml, colors.xml
+  - AndroidManifest.xml e build.gradle prontos
+
+Como abrir no Android Studio:
+  1. Abra o Android Studio e escolha "Open" ou importe a pasta.
+  2. Clique no botão "Run" (ícone verde de play) para rodar no seu celular via USB
+     ou no Emulador.
+  3. Para gerar o instalador do celular, vá em Build > Build Bundle(s) / APK(s) > Build APK(s).
+==============================================================================
+`
       );
 
-      // Add all files with their relative paths
+      // Adicionar todos os arquivos com os caminhos corretos
       JAVA_PROJECT_FILES.forEach((f) => {
         zip.file(f.path, f.content);
       });
@@ -71,13 +118,13 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
       const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'BlocoDeNotas_Android_Java.zip';
+      link.download = 'BlocoDeNotas_Completo_Java.zip';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      onShowToast('Projeto Android Java (.zip) baixado com sucesso!', 'success');
+      onShowToast('Pacote completo em Java (.ZIP) baixado com sucesso!', 'success');
     } catch (err) {
       console.error(err);
       onShowToast('Erro ao compactar o arquivo zip.', 'info');
@@ -86,49 +133,62 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
     }
   };
 
+  const pureJavaFile = JAVA_PROJECT_FILES.find((f) => f.name === 'BlocoDeNotasApp.java') || JAVA_PROJECT_FILES[0];
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="java-modal-title"
     >
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full h-[92vh] flex flex-col shadow-2xl text-slate-100 overflow-hidden">
         
         {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-900/90 shrink-0">
+        <div className="px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-900/95 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-red-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20 shrink-0">
               <Code2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white">
-                  Código Fonte do App em Java (Android)
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 id="java-modal-title" className="text-sm sm:text-base font-bold text-white leading-tight">
+                  Código do Bloco de Notas em Java
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  Java + SQLite + Android Studio
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  Java Puro & Android Nativo
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                Arquivos 100% nativos prontos para compilar no Android Studio e rodar no seu celular
+                Toda a lógica foi estruturada em Java: baixe o arquivo individual ou o projeto completo (.ZIP)
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Quick Download BlocoDeNotasApp.java */}
+            <button
+              onClick={() => handleDownloadSingleFile(pureJavaFile)}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-sm active:scale-95 cursor-pointer"
+              title="Baixar apenas o arquivo BlocoDeNotasApp.java executável"
+            >
+              <Coffee className="w-3.5 h-3.5 text-amber-900" />
+              <span>Baixar BlocoDeNotasApp.java</span>
+            </button>
+
+            {/* Download Full ZIP */}
             <button
               onClick={handleDownloadZip}
               disabled={isZipping}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all active:scale-95 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all active:scale-95 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
             >
               <FolderArchive className="w-4 h-4" />
-              <span className="hidden sm:inline">Baixar Projeto Completo (.ZIP)</span>
-              <span className="sm:hidden">Baixar .ZIP</span>
+              <span>Baixar Tudo (.ZIP)</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label="Fechar modal"
             >
               <X className="w-5 h-5" />
@@ -136,27 +196,72 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
           </div>
         </div>
 
+        {/* Quick Instructions Banner */}
+        <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between gap-3 text-xs shrink-0 flex-wrap">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Terminal className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span>Como rodar via terminal:</span>
+            <code className="px-2 py-0.5 bg-slate-800 rounded font-mono text-emerald-400 text-[11px] select-all">
+              javac BlocoDeNotasApp.java && java BlocoDeNotasApp
+            </code>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400">Filtrar:</span>
+            <div className="inline-flex p-0.5 rounded-lg bg-slate-800 text-[11px]">
+              <button
+                onClick={() => setActiveCategory('all')}
+                className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
+                  activeCategory === 'all' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Todos ({JAVA_PROJECT_FILES.length})
+              </button>
+              <button
+                onClick={() => setActiveCategory('pure_java')}
+                className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
+                  activeCategory === 'pure_java' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                ☕ Java Puro
+              </button>
+              <button
+                onClick={() => setActiveCategory('android')}
+                className={`px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer ${
+                  activeCategory === 'android' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                📱 Android Studio
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Modal Body: Sidebar with Files + Code Viewer */}
         <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
           
           {/* Files Sidebar */}
-          <div className="w-full md:w-72 bg-slate-950/70 border-b md:border-b-0 md:border-r border-slate-800/80 p-3 overflow-y-auto shrink-0 flex md:flex-col gap-1.5 max-h-36 md:max-h-full">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1 hidden md:block">
-              Arquivos Java & Recursos
+          <div className="w-full md:w-72 bg-slate-950/80 border-b md:border-b-0 md:border-r border-slate-800/80 p-2.5 overflow-y-auto shrink-0 flex md:flex-col gap-1 max-h-36 md:max-h-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-2 py-1 hidden md:block">
+              Arquivos ({filteredFiles.length})
             </span>
-            {JAVA_PROJECT_FILES.map((file) => {
+            {filteredFiles.map((file) => {
               const isSelected = selectedFile.name === file.name;
               return (
                 <button
                   key={file.name}
                   onClick={() => setSelectedFile(file)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-left transition-all shrink-0 md:w-full cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-left transition-all shrink-0 md:w-full cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold'
-                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-bold'
+                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
                   }`}
                 >
-                  <FileCode className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-blue-400'}`} />
+                  {file.name.endsWith('.java') ? (
+                    <Coffee className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-amber-400'}`} />
+                  ) : (
+                    <FileCode className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-blue-400'}`} />
+                  )}
                   <span className="truncate">{file.name}</span>
                 </button>
               );
@@ -166,7 +271,7 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
           {/* Code Viewer */}
           <div className="flex-1 flex flex-col min-h-0 bg-slate-900">
             {/* File info bar */}
-            <div className="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 text-xs shrink-0">
+            <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 text-xs shrink-0">
               <div className="truncate">
                 <span className="font-mono text-blue-400 font-semibold">{selectedFile.path}</span>
                 <p className="text-[11px] text-slate-400 truncate mt-0.5">{selectedFile.description}</p>
@@ -175,19 +280,19 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={handleCopyCode}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copiado!' : 'Copiar'}</span>
                 </button>
 
                 <button
-                  onClick={handleDownloadSingleFile}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium"
+                  onClick={() => handleDownloadSingleFile(selectedFile)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all cursor-pointer font-medium active:scale-95"
                   title="Baixar apenas este arquivo"
                 >
                   <Download className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="hidden sm:inline">Baixar</span>
+                  <span className="hidden sm:inline">Baixar Arquivo</span>
                 </button>
               </div>
             </div>
@@ -204,13 +309,13 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
         </div>
 
         {/* Modal Footer with quick instructions */}
-        <div className="px-5 py-3 border-t border-slate-800 bg-slate-950/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 shrink-0">
+        <div className="px-5 py-2.5 border-t border-slate-800 bg-slate-950/90 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 shrink-0">
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Compatível com Android 8.0 até Android 15 (minSdk 24, compileSdk 34)</span>
+            <span>Formato Celular • Categorias (Estudos, Trabalho, Pessoal) • Modo Escuro • SQLite / Arquivo Local</span>
           </div>
           <div className="flex items-center gap-3">
-            <span>Tecnologia: <strong>Java puro + SQLite nativo</strong></span>
+            <span className="text-amber-400 font-semibold">100% Java</span>
           </div>
         </div>
 
