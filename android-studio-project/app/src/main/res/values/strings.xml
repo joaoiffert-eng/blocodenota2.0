@@ -1,8 +1,32 @@
 <resources>
     <string name="app_name">Bloco de Notas</string>
+    <string name="app_subtitle">Java • Acessível</string>
+    <string name="title_editor">Editar Anotação</string>
+    <string name="title_viewer">Visualizar Anotação</string>
+
     <string name="category_studies">Estudos</string>
     <string name="category_work">Trabalho</string>
     <string name="category_personal">Pessoal</string>
-    <string name="category_all">Todas</string>
-    <string name="category_favorites">Favoritos</string>
+
+    <string name="hint_search">Pesquisar por título ou conteúdo...</string>
+    <string name="hint_title">Título da anotação...</string>
+    <string name="hint_content">Escreva sua anotação aqui...</string>
+
+    <string name="btn_back">← Voltar</string>
+    <string name="btn_save">Salvar</string>
+    <string name="btn_edit">Editar</string>
+
+    <string name="cd_search">Pesquisar</string>
+    <string name="cd_clear_search">Limpar pesquisa</string>
+    <string name="cd_text_size">Alterar tamanho do texto</string>
+    <string name="cd_toggle_theme">Alternar modo escuro</string>
+    <string name="cd_exit">Sair do aplicativo</string>
+    <string name="cd_new_note">Criar nova anotação</string>
+    <string name="cd_pin">Fixar no topo</string>
+    <string name="cd_favorite">Favoritar anotação</string>
+    <string name="cd_view">Visualizar anotação</string>
+    <string name="cd_edit">Editar anotação</string>
+    <string name="cd_delete">Excluir anotação</string>
+    <string name="cd_copy">Copiar anotação</string>
+    <string name="cd_share">Compartilhar anotação</string>
 </resources>

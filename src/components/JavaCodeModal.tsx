@@ -17,6 +17,7 @@ import {
   Play
 } from 'lucide-react';
 import { JAVA_PROJECT_FILES, JavaProjectFile } from '../data/javaCodeFiles';
+import { ANDROID_BINARY_ASSETS } from '../data/androidBinaryAssets';
 import JSZip from 'jszip';
 
 interface JavaCodeModalProps {
@@ -25,7 +26,7 @@ interface JavaCodeModalProps {
   onShowToast: (msg: string, type?: 'success' | 'info') => void;
 }
 
-type CategoryType = 'all' | 'android_java' | 'android_res' | 'android_config' | 'pure_java';
+type CategoryType = 'all' | 'android_java' | 'android_res' | 'android_config';
 
 export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
   isOpen,
@@ -45,7 +46,6 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
     if (activeCategory === 'android_java') return f.category === 'android_java';
     if (activeCategory === 'android_res') return f.category === 'android_res';
     if (activeCategory === 'android_config') return f.category === 'android_config';
-    if (activeCategory === 'pure_java') return f.category === 'pure_java';
     return true;
   });
 
@@ -81,69 +81,73 @@ export const JavaCodeModal: React.FC<JavaCodeModalProps> = ({
 BLOCO DE NOTAS MODERNO & ACESSÍVEL - PROJETO ANDROID STUDIO (JAVA)
 ==============================================================================
 
-Como importar e rodar este projeto no Android Studio:
+Como importar e rodar este projeto no Android Studio (Versões Iguana/Jellyfish/Koala/Ladybug+):
 
 1. DESCOMPACTAR O ARQUIVO:
    Extraia todo o conteúdo deste arquivo .zip em uma pasta de sua preferência
    (por exemplo: C:\\Projetos\\BlocoDeNotas ou ~/Projetos/BlocoDeNotas).
 
-2. ABRIR NO ANDROID STUDIO:
+2. ATENÇÃO AO ABRIR NO ANDROID STUDIO (PASSO MAIS IMPORTANTE):
    - Abra o Android Studio.
-   - Na tela inicial, clique em "Open" (ou vá em File > Open se já estiver com outro projeto aberto).
-   - Navegue até a pasta onde descompactou os arquivos (onde estão os arquivos 'settings.gradle' e 'build.gradle').
-   - Selecione a pasta e clique em "OK".
+   - Na tela inicial, clique em "Open" (ou vá em File > Open).
+   - Navegue até a pasta que contém DIRETAMENTE os arquivos 'settings.gradle'
+     e 'build.gradle' (ATENÇÃO: se o Windows criar uma subpasta extra ao extrair
+     o .zip, entre nela e selecione a pasta que possui o 'settings.gradle').
+   - Clique em "OK".
 
 3. SINCRONIZAÇÃO DO GRADLE:
-   - O Android Studio detectará automaticamente o projeto Gradle e fará o download
-     das dependências necessárias (Material Design, RecyclerView, etc.).
-   - Aguarde a barra de progresso inferior finalizar o "Gradle sync finished".
+   - O projeto está configurado com Gradle 8.7 e Android Gradle Plugin (AGP) 8.5.2,
+     compatível com JDK 17 e JDK 21 (padrão das versões atuais do Android Studio).
+   - Aguarde a barra inferior finalizar o "Gradle sync finished".
 
 4. EXECUTAR NO CELULAR OU EMULADOR:
-   - Conecte seu celular Android via cabo USB (com Depuração USB ativada em Opções do Desenvolvedor)
+   - Conecte seu celular Android via cabo USB (com Depuração USB ativada)
      OU selecione um Emulador Virtual (AVD).
-   - Clique no botão verde de "Run" (ícone de Play ▶ ou atalho Shift + F10).
-   - O app será instalado e aberto imediatamente no seu celular!
+   - Clique no botão verde de "Run" (ícone de Play ▶ ou Shift + F10).
 
 5. GERAR O ARQUIVO INSTALADOR .APK:
    - No menu superior do Android Studio, vá em:
      Build > Build Bundle(s) / APK(s) > Build APK(s)
-   - Ao finalizar, clique em "locate" para pegar o arquivo 'app-debug.apk'
-     e enviar diretamente para qualquer celular Android via WhatsApp, e-mail ou USB.
+   - Ao finalizar, clique em "locate" para pegar o arquivo 'app-debug.apk'.
 
 ==============================================================================
-ESTRUTURA DOS ARQUIVOS INCLUÍDOS:
+ESTRUTURA DOS ARQUIVOS INCLUÍDOS NO .ZIP:
 ==============================================================================
-- settings.gradle                         -> Configuração de módulos
-- build.gradle                            -> Gradle raiz do projeto
-- gradle.properties                       -> Parâmetros AndroidX
-- gradle/wrapper/gradle-wrapper.properties-> Wrapper Gradle 8.2
-- app/build.gradle                        -> Configuração do módulo :app
-- app/src/main/AndroidManifest.xml        -> Manifesto e Activities
+- settings.gradle                            -> Configuração de módulos e repositórios
+- build.gradle                               -> AGP 8.5.2 (JDK 17/21)
+- gradle.properties                          -> AndroidX habilitado
+- gradle/wrapper/gradle-wrapper.properties   -> Wrapper Gradle 8.7
+- .gitignore                                 -> Regras padrão Git Android Studio
+- app/build.gradle                           -> SDK 34 (minSdk 24), Material + RecyclerView
+- app/proguard-rules.pro                     -> Regras ProGuard/R8
+- app/src/main/AndroidManifest.xml           -> Manifesto sem atributo package duplicado
 - app/src/main/java/com/blocodenotas/app/
-    ├── MainActivity.java                 -> Tela principal, busca e categorias
-    ├── NoteEditorActivity.java           -> Criação e edição de notas
-    ├── NoteViewerActivity.java           -> Leitura completa e ações
-    ├── model/Note.java                   -> Modelo da anotação
-    ├── database/NoteDatabaseHelper.java  -> Banco SQLite offline
-    └── adapter/NoteAdapter.java          -> Renderizador dos cartões modernos
+    ├── MainActivity.java                    -> Tela inicial, busca, abas e modo escuro
+    ├── NoteEditorActivity.java              -> Criação/edição com categorias e formatação
+    ├── NoteViewerActivity.java              -> Leitura, copiar, compartilhar, excluir
+    ├── model/Note.java                      -> Modelo da anotação
+    ├── database/NoteDatabaseHelper.java     -> Banco SQLite offline
+    ├── adapter/NoteAdapter.java             -> Cartões modernos (Azul/Verde/Lilás)
+    └── utils/PrefsManager.java              -> Tema escuro e tamanho de texto persistentes
 - app/src/main/res/
-    ├── layout/activity_main.xml          -> Layout da tela inicial
-    ├── layout/activity_editor.xml        -> Layout da tela de edição
-    ├── layout/activity_viewer.xml        -> Layout da tela de leitura
-    ├── layout/item_note.xml              -> Layout de cada cartão de nota
-    ├── menu/bottom_nav_menu.xml          -> Menu da barra inferior (Categorias)
-    ├── values/colors.xml                 -> Paleta: Azul, Verde, Lilás e Branco
-    ├── values/strings.xml                -> Textos em português
-    ├── values/themes.xml                 -> Tema claro Material Design
-    └── values-night/themes.xml           -> Tema escuro (Modo Noturno)
-- BlocoDeNotasApp.java                    -> Versão Java puro executável via terminal
+    ├── layout/                              -> activity_main, activity_editor, activity_viewer, item_note
+    ├── drawable/                            -> Formas arredondadas e 16 ícones vetoriais XML
+    ├── mipmap-anydpi-v26/                   -> Ícones adaptativos (Android 8+)
+    ├── mipmap-mdpi .. mipmap-xxxhdpi/       -> 10 ícones PNG de launcher em alta resolução
+    ├── values/ & values-night/              -> colors.xml, strings.xml, themes.xml (Claro + Escuro)
+    └── xml/                                 -> backup_rules.xml e data_extraction_rules.xml
 ==============================================================================
 `
       );
 
-      // Adicionar todos os arquivos com os caminhos relativos de projeto Android
+      // Adicionar todos os arquivos de código, Gradle e XML
       JAVA_PROJECT_FILES.forEach((f) => {
         zip.file(f.path, f.content);
+      });
+
+      // Adicionar os ícones PNG reais nas pastas mipmap-*
+      ANDROID_BINARY_ASSETS.forEach((asset) => {
+        zip.file(asset.path, asset.base64, { base64: true });
       });
 
       const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -226,7 +230,7 @@ ESTRUTURA DOS ARQUIVOS INCLUÍDOS:
               </span>
               <span>1. Baixe o <strong>.ZIP</strong> e extraia</span>
               <span className="text-slate-600">•</span>
-              <span>2. No Android Studio: <strong>File &gt; Open</strong> e selecione a pasta</span>
+              <span>2. No Android Studio: <strong>File &gt; Open</strong> na pasta do <strong>settings.gradle</strong></span>
               <span className="text-slate-600">•</span>
               <span>3. Clique em <strong>Run (▶)</strong></span>
             </div>
@@ -350,7 +354,9 @@ ESTRUTURA DOS ARQUIVOS INCLUÍDOS:
         <div className="px-5 py-2.5 border-t border-slate-800 bg-slate-950/90 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 shrink-0">
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Configurado com Gradle 8.2 • SDK 34 • Material Components • SQLite Nativo</span>
+            <span>
+              Gradle 8.7 • AGP 8.5.2 • SDK 34 • Material Components • SQLite + {ANDROID_BINARY_ASSETS.length} ícones PNG inclusos no .ZIP
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <button

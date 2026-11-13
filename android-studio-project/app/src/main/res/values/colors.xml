@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta Harmônica do Aplicativo -->
     <color name="primary_blue">#2563EB</color>
-    <color name="primary_blue_light">#DBEAFE</color>
-    <color name="study_blue">#1D4ED8</color>
-
+    <color name="study_blue_dark">#1D4ED8</color>
     <color name="work_green">#059669</color>
-    <color name="work_green_light">#D1FAE5</color>
-
     <color name="personal_purple">#7C3AED</color>
-    <color name="personal_purple_light">#EDE9FE</color>
-
     <color name="favorite_yellow">#F59E0B</color>
+    <color name="danger_red">#E11D48</color>
 
-    <color name="bg_light">#F8FAFC</color>
-    <color name="bg_dark">#0F172A</color>
-    <color name="card_light">#FFFFFF</color>
-    <color name="card_dark">#1E293B</color>
+    <color name="bg_screen">#F8FAFC</color>
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_search">#F1F5F9</color>
+    <color name="border_card">#E2E8F0</color>
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#64748B</color>
+    <color name="icon_muted">#64748B</color>
+
+    <color name="tag_studies_bg">#DBEAFE</color>
+    <color name="tag_studies_text">#1D4ED8</color>
+    <color name="tag_work_bg">#D1FAE5</color>
+    <color name="tag_work_text">#047857</color>
+    <color name="tag_personal_bg">#EDE9FE</color>
+    <color name="tag_personal_text">#6D28D9</color>
+
+    <color name="tab_all_active">#0F172A</color>
+    <color name="tab_active_text">#FFFFFF</color>
+    <color name="tab_inactive_bg">#F1F5F9</color>
 </resources>

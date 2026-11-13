@@ -16,8 +16,9 @@ public class Note implements Serializable {
     private long updatedAt;
 
     public Note() {
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        this.createdAt = now;
+        this.updatedAt = now;
         this.category = "estudos";
         this.isFavorite = false;
         this.isPinned = false;
@@ -30,39 +31,89 @@ public class Note implements Serializable {
         this.category = category;
     }
 
-    // Getters e Setters
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { 
-        this.title = title; 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title != null ? title : "";
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
         this.updatedAt = System.currentTimeMillis();
     }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { 
-        this.content = content; 
+    public String getContent() {
+        return content != null ? content : "";
+    }
+
+    public void setContent(String content) {
+        this.content = content;
         this.updatedAt = System.currentTimeMillis();
     }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getCategory() {
+        return category != null ? category : "estudos";
+    }
 
-    public boolean isFavorite() { return isFavorite; }
-    public void setFavorite(boolean favorite) { isFavorite = favorite; }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-    public boolean isPinned() { return isPinned; }
-    public void setPinned(boolean pinned) { isPinned = pinned; }
+    public boolean isFavorite() {
+        return isFavorite;
+    }
 
-    public long getCreatedAt() { return createdAt; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
-    public long getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
+    public boolean isPinned() {
+        return isPinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public String getFormattedDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("pt", "BR"));
         return sdf.format(new Date(this.updatedAt));
+    }
+
+    public String getFormattedCreatedDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", new Locale("pt", "BR"));
+        return sdf.format(new Date(this.createdAt));
+    }
+
+    public int getWordCount() {
+        String text = getContent().trim();
+        if (text.isEmpty()) return 0;
+        return text.split("\\s+").length;
+    }
+
+    public int getReadTimeMinutes() {
+        return Math.max(1, (int) Math.ceil(getWordCount() / 200.0));
     }
 }

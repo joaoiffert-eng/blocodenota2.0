@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="#FFFFFF"
-    app:strokeColor="#E2E8F0"
+    app:cardBackgroundColor="@color/bg_surface"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="1dp"
+    app:strokeColor="@color/border_card"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -17,24 +16,42 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Linha Superior: Tag Categoria + Badge Fixada + Botões Fixar/Favoritar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Tag de Categoria com cantos arredondados -->
             <TextView
                 android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ESTUDOS"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
+                android:background="@drawable/bg_rounded_pill"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:text="Estudos"
                 android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPinnedBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_rounded_pill"
+                android:backgroundTint="@color/tag_studies_bg"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="Fixada"
+                android:textColor="@color/primary_blue"
+                android:textSize="10sp"
                 android:textStyle="bold"
-                android:background="#DBEAFE"
-                android:textColor="#1E40AF" />
+                android:visibility="gone" />
 
             <View
                 android:layout_width="0dp"
@@ -42,46 +59,63 @@
                 android:layout_weight="1" />
 
             <ImageButton
+                android:id="@+id/btnPin"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_pin"
+                android:padding="6dp"
+                android:src="@drawable/ic_pin" />
+
+            <ImageButton
                 android:id="@+id/btnFavorite"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/star_big_off" />
+                android:contentDescription="@string/cd_favorite"
+                android:padding="6dp"
+                android:src="@drawable/ic_star_outline" />
         </LinearLayout>
 
+        <!-- Título -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="Título da Anotação"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#0F172A" />
+            android:textStyle="bold" />
 
+        <!-- Prévia do Conteúdo -->
         <TextView
             android:id="@+id/tvContentPreview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:maxLines="3"
             android:ellipsize="end"
-            android:text="Prévia do conteúdo detalhado da anotação com leitura agradável e contraste ideal..."
-            android:textSize="13sp"
-            android:textColor="#64748B" />
+            android:lineSpacingExtra="2dp"
+            android:maxLines="3"
+            android:text="Prévia do conteúdo da anotação..."
+            android:textColor="@color/text_secondary"
+            android:textSize="13.5sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
-            android:background="#F1F5F9" />
+            android:background="@color/border_card" />
 
+        <!-- Rodapé: Data e Botões (Visualizar, Editar, Excluir) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tvDate"
@@ -89,22 +123,38 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="16/10/2026 10:30"
-                android:textSize="12sp"
-                android:textColor="#94A3B8" />
+                android:textColor="@color/text_secondary"
+                android:textSize="11.5sp" />
+
+            <ImageButton
+                android:id="@+id/btnView"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_view"
+                android:padding="6dp"
+                android:src="@drawable/ic_eye"
+                app:tint="@color/primary_blue" />
 
             <ImageButton
                 android:id="@+id/btnEdit"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_edit" />
+                android:contentDescription="@string/cd_edit"
+                android:padding="6dp"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/work_green" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:contentDescription="@string/cd_delete"
+                android:padding="6dp"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/danger_red" />
         </LinearLayout>
 
     </LinearLayout>

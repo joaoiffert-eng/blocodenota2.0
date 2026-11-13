@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_blue">#3B82F6</color>
+    <color name="study_blue_dark">#2563EB</color>
+    <color name="work_green">#10B981</color>
+    <color name="personal_purple">#A78BFA</color>
+    <color name="favorite_yellow">#FBBF24</color>
+    <color name="danger_red">#FB7185</color>
+
+    <color name="bg_screen">#020617</color>
+    <color name="bg_surface">#0F172A</color>
+    <color name="bg_search">#1E293B</color>
+    <color name="border_card">#1E293B</color>
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="icon_muted">#94A3B8</color>
+
+    <color name="tag_studies_bg">#1E3A8A</color>
+    <color name="tag_studies_text">#93C5FD</color>
+    <color name="tag_work_bg">#064E3B</color>
+    <color name="tag_work_text">#6EE7B7</color>
+    <color name="tag_personal_bg">#4C1D95</color>
+    <color name="tag_personal_text">#DDD6FE</color>
+
+    <color name="tab_all_active">#F8FAFC</color>
+    <color name="tab_active_text">#0F172A</color>
+    <color name="tab_inactive_bg">#1E293B</color>
+</resources>
